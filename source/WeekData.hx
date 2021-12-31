@@ -6,12 +6,7 @@ class WeekData {
 	//Go to StoryMenuState.hx and add the characters/backgrounds
 	public static var songsNames:Array<Dynamic> = [
 		['Tutorial'],								//Tutorial, this one isn't added to Freeplay, instead it is added from assets/preload/freeplaySonglist.txt
-		['Bopeebo', 'Fresh', 'Dad-Battle'],			//Week 1
-		['Spookeez', 'South', 'Monster'],			//Week 2
-		['Pico', 'Philly-Nice', 'Blammed'],			//Week 3
-		['Satin-Panties', 'High', 'Milf'],			//Week 4
-		['Cocoa', 'Eggnog', 'Winter-Horrorland'],	//Week 5
-		['Senpai', 'Roses', 'Thorns']				//Week 6
+		['Chirumiru'],			//Week 1
 	];
 
 	// Custom week number, used for your week's score not being overwritten by a new vanilla week when the game updates
@@ -19,7 +14,7 @@ class WeekData {
 	// null = Don't change week number, it follows the vanilla weeks number order
 	public static var weekNumber:Array<Dynamic> = [
 		null,	//Tutorial
-		null,	//Week 1
+		9,	//Week 1
 		null,	//Week 2
 		null,	//Week 3
 		null,	//Week 4
@@ -36,7 +31,7 @@ class WeekData {
 	//if you have the Low Quality option disabled on "Preferences"
 	public static var loadDirectory:Array<String> = [
 		'tutorial', //Tutorial loads "tutorial" folder on assets/
-		null,	//Week 1
+		'cirnoweek',	//Week 1
 		null,	//Week 2
 		null,	//Week 3
 		null,	//Week 4
