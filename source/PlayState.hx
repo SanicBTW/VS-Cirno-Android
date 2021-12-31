@@ -300,7 +300,7 @@ class PlayState extends MusicBeatState
 				curStage = 'cirnoday';
 
 				defaultCamZoom = 1;
-				var bg:BGSprite = new BGSprite(Paths.image('cirnobg', 'cirnoweek'), -200, -200, 0, 0);
+				var bg:BGSprite = new BGSprite('cirnobg', -200, -200, 0, 0);
 				add(bg);
 
 				idiot = new FlxBackdrop(Paths.image('idiot', 'cirnoweek'), 1, 0, true, false);
@@ -313,13 +313,13 @@ class PlayState extends MusicBeatState
 				idiot2.velocity.set(-100, 0);
 				idiot2.scrollFactor.set(0, 0);
 
-				chiritexttop = new BGSprite(Paths.image('chirutext', 'cirnoweek'), -1080, 0, 0, 0);
+				chiritexttop = new BGSprite('chirutext', -1080, 0, 0, 0);
 				add(chiritexttop);
 
-				chiritextbottom = new BGSprite(Paths.image('chirutext2', 'cirnoweek'), 1080, 0, 0, 0);
+				chiritextbottom = new BGSprite('chirutext2', 1080, 0, 0, 0);
 				add(chiritextbottom);
 
-				var stageFront:BGSprite = new BGSprite(Paths.image('cirnofloor', 'cirnoweek'), -425, -330, 0.9, 0.9);
+				var stageFront:BGSprite = new BGSprite('cirnofloor', -425, -330, 0.9, 0.9);
 				stageFront.setGraphicSize(Std.int(stageFront.width * 1.15));
 				stageFront.updateHitbox();
 				add(stageFront);	
