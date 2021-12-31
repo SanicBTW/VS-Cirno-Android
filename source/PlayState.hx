@@ -1,5 +1,6 @@
 package;
 
+import flixel.addons.display.FlxBackdrop;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -229,6 +230,13 @@ class PlayState extends MusicBeatState
 	// Lua shit
 	public var backgroundGroup:FlxTypedGroup<FlxSprite>;
 	public var foregroundGroup:FlxTypedGroup<FlxSprite>;
+	var idiot:FlxBackdrop;
+	var idiot2:FlxBackdrop;
+
+	var cirnoMode:Bool = false;
+
+	var chiritexttop:FlxSprite;
+	var chiritextbottom:FlxSprite;
 
 	override public function create()
 	{
@@ -288,279 +296,33 @@ class PlayState extends MusicBeatState
 
 		switch (SONG.song.toLowerCase())
 		{
-			case 'spookeez' | 'south' | 'monster':
-				curStage = 'spooky';
+			case 'chirumiru':
+				curStage = 'cirnoday';
 
-				if(!ClientPrefs.lowQuality) {
-					halloweenBG = new BGSprite('halloween_bg', -200, -100, ['halloweem bg0', 'halloweem bg lightning strike']);
-				} else {
-					halloweenBG = new BGSprite('halloween_bg_low', -200, -100);
-				}
-				add(halloweenBG);
-
-				halloweenWhite = new BGSprite(null, -FlxG.width, -FlxG.height, 0, 0);
-				halloweenWhite.makeGraphic(Std.int(FlxG.width * 3), Std.int(FlxG.height * 3), FlxColor.WHITE);
-				halloweenWhite.alpha = 0;
-
-				//PRECACHE SOUNDS
-				CoolUtil.precacheSound('thunder_1');
-				CoolUtil.precacheSound('thunder_2');
-
-			case 'pico' | 'blammed' | 'philly-nice':
-				curStage = 'philly';
-
-				if(!ClientPrefs.lowQuality) {
-					var bg:BGSprite = new BGSprite('philly/sky', -100, 0, 0.1, 0.1);
-					add(bg);
-				}
-
-				var city:BGSprite = new BGSprite('philly/city', -10, 0, 0.3, 0.3);
-				city.setGraphicSize(Std.int(city.width * 0.85));
-				city.updateHitbox();
-				add(city);
-
-				phillyCityLights = new FlxTypedGroup<BGSprite>();
-				add(phillyCityLights);
-
-				for (i in 0...5)
-				{
-					var light:BGSprite = new BGSprite('philly/win' + i, city.x, city.y, 0.3, 0.3);
-					light.visible = false;
-					light.setGraphicSize(Std.int(light.width * 0.85));
-					light.updateHitbox();
-					phillyCityLights.add(light);
-				}
-
-				if(!ClientPrefs.lowQuality) {
-					var streetBehind:BGSprite = new BGSprite('philly/behindTrain', -40, 50);
-					add(streetBehind);
-				}
-
-				phillyTrain = new BGSprite('philly/train', 2000, 360);
-				add(phillyTrain);
-
-				trainSound = new FlxSound().loadEmbedded(Paths.sound('train_passes'));
-				CoolUtil.precacheSound('train_passes');
-				FlxG.sound.list.add(trainSound);
-
-				var street:BGSprite = new BGSprite('philly/street', -40, 50);
-				add(street);
-
-				phillyBlack = new BGSprite(null, 0, 0, 0, 0);
-				phillyBlack.makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
-				phillyBlack.alpha = 0.0;
-				add(phillyBlack);
-
-				phillyCityLightsEvent = new FlxTypedGroup<BGSprite>();
-				add(phillyCityLightsEvent);
-				for (i in 0...5)
-				{
-					var light:BGSprite = new BGSprite('philly/win' + i, city.x, city.y, 0.3, 0.3);
-					light.visible = false;
-					light.setGraphicSize(Std.int(light.width * 0.85));
-					light.updateHitbox();
-					phillyCityLightsEvent.add(light);
-				}
-
-			case 'milf' | 'satin-panties' | 'high':
-				curStage = 'limo';
-				defaultCamZoom = 0.9;
-
-				var skyBG:BGSprite = new BGSprite('limo/limoSunset', -120, -50, 0.1, 0.1);
-				add(skyBG);
-
-				if(!ClientPrefs.lowQuality) {
-					limoMetalPole = new BGSprite('gore/metalPole', -500, 220, 0.4, 0.4);
-					add(limoMetalPole);
-
-					bgLimo = new BGSprite('limo/bgLimo', -150, 480, 0.4, 0.4, ['background limo pink'], true);
-					add(bgLimo);
-
-					limoCorpse = new BGSprite('gore/noooooo', -500, limoMetalPole.y - 130, 0.4, 0.4, ['Henchmen on rail'], true);
-					add(limoCorpse);
-
-					limoCorpseTwo = new BGSprite('gore/noooooo', -500, limoMetalPole.y, 0.4, 0.4, ['henchmen death'], true);
-					add(limoCorpseTwo);
-
-					grpLimoDancers = new FlxTypedGroup<BackgroundDancer>();
-					add(grpLimoDancers);
-
-					for (i in 0...5)
-					{
-						var dancer:BackgroundDancer = new BackgroundDancer((370 * i) + 130, bgLimo.y - 400);
-						dancer.scrollFactor.set(0.4, 0.4);
-						grpLimoDancers.add(dancer);
-					}
-
-					limoLight = new BGSprite('gore/coldHeartKiller', limoMetalPole.x - 180, limoMetalPole.y - 80, 0.4, 0.4);
-					add(limoLight);
-
-					grpLimoParticles = new FlxTypedGroup<BGSprite>();
-					add(grpLimoParticles);
-
-					//PRECACHE BLOOD
-					var particle:BGSprite = new BGSprite('gore/stupidBlood', -400, -400, 0.4, 0.4, ['blood'], false);
-					particle.alpha = 0.01;
-					grpLimoParticles.add(particle);
-					resetLimoKill();
-
-					//PRECACHE SOUND
-					CoolUtil.precacheSound('dancerdeath');
-				}
-
-				limo = new BGSprite('limo/limoDrive', -120, 550, 1, 1, ['Limo stage'], true);
-
-				fastCar = new BGSprite('limo/fastCarLol', -300, 160);
-				fastCar.active = true;
-				limoKillingState = 0;
-
-			case 'cocoa' | 'eggnog':
-				curStage = 'mall';
-
-				defaultCamZoom = 0.8;
-
-				var bg:BGSprite = new BGSprite('christmas/bgWalls', -1000, -500, 0.2, 0.2);
-				bg.setGraphicSize(Std.int(bg.width * 0.8));
-				bg.updateHitbox();
+				defaultCamZoom = 1;
+				var bg:BGSprite = new BGSprite(Paths.image('cirnobg', 'cirnoweek'), -200, -200, 0, 0);
 				add(bg);
 
-				if(!ClientPrefs.lowQuality) {
-					upperBoppers = new BGSprite('christmas/upperBop', -240, -90, 0.33, 0.33, ['Upper Crowd Bob']);
-					upperBoppers.setGraphicSize(Std.int(upperBoppers.width * 0.85));
-					upperBoppers.updateHitbox();
-					add(upperBoppers);
+				idiot = new FlxBackdrop(Paths.image('idiot', 'cirnoweek'), 1, 0, true, false);
+				add(idiot);
+				idiot.velocity.set(100, 0);
+				idiot.scrollFactor.set(0, 0);
 
-					var bgEscalator:BGSprite = new BGSprite('christmas/bgEscalator', -1100, -600, 0.3, 0.3);
-					bgEscalator.setGraphicSize(Std.int(bgEscalator.width * 0.9));
-					bgEscalator.updateHitbox();
-					add(bgEscalator);
-				}
+				idiot2  = new FlxBackdrop(Paths.image('idiot2', 'cirnoweek'), -1, 0, true, false);
+				add(idiot2);
+				idiot2.velocity.set(-100, 0);
+				idiot2.scrollFactor.set(0, 0);
 
-				var tree:BGSprite = new BGSprite('christmas/christmasTree', 370, -250, 0.40, 0.40);
-				add(tree);
+				chiritexttop = new BGSprite(Paths.image('chirutext', 'cirnoweek'), -1080, 0, 0, 0);
+				add(chiritexttop);
 
-				bottomBoppers = new BGSprite('christmas/bottomBop', -300, 140, 0.9, 0.9, ['Bottom Level Boppers Idle']);
-				bottomBoppers.animation.addByPrefix('hey', 'Bottom Level Boppers HEY', 24, false);
-				bottomBoppers.setGraphicSize(Std.int(bottomBoppers.width * 1));
-				bottomBoppers.updateHitbox();
-				add(bottomBoppers);
+				chiritextbottom = new BGSprite(Paths.image('chirutext2', 'cirnoweek'), 1080, 0, 0, 0);
+				add(chiritextbottom);
 
-				var fgSnow:BGSprite = new BGSprite('christmas/fgSnow', -600, 700);
-				add(fgSnow);
-
-				santa = new BGSprite('christmas/santa', -840, 150, 1, 1, ['santa idle in fear']);
-				add(santa);
-				CoolUtil.precacheSound('Lights_Shut_off');
-
-			case 'winter-horrorland':
-				curStage = 'mallEvil';
-				var bg:BGSprite = new BGSprite('christmas/evilBG', -400, -500, 0.2, 0.2);
-				bg.setGraphicSize(Std.int(bg.width * 0.8));
-				bg.updateHitbox();
-				add(bg);
-
-				var evilTree:BGSprite = new BGSprite('christmas/evilTree', 300, -300, 0.2, 0.2);
-				add(evilTree);
-
-				var evilSnow:BGSprite = new BGSprite('christmas/evilSnow', -200, 700);
-				add(evilSnow);
-
-			case 'senpai' | 'roses':
-				curStage = 'school';
-
-				// defaultCamZoom = 0.9;
-
-				var bgSky:BGSprite = new BGSprite('weeb/weebSky', 0, 0, 0.1, 0.1);
-				add(bgSky);
-				bgSky.antialiasing = false;
-
-				var repositionShit = -200;
-
-				var bgSchool:BGSprite = new BGSprite('weeb/weebSchool', repositionShit, 0, 0.6, 0.90);
-				add(bgSchool);
-				bgSchool.antialiasing = false;
-
-				var bgStreet:BGSprite = new BGSprite('weeb/weebStreet', repositionShit, 0, 0.95, 0.95);
-				add(bgStreet);
-				bgStreet.antialiasing = false;
-
-				var widShit = Std.int(bgSky.width * 6);
-				if(!ClientPrefs.lowQuality) {
-					var fgTrees:BGSprite = new BGSprite('weeb/weebTreesBack', repositionShit + 170, 130, 0.9, 0.9);
-					fgTrees.setGraphicSize(Std.int(widShit * 0.8));
-					fgTrees.updateHitbox();
-					add(fgTrees);
-					fgTrees.antialiasing = false;
-				}
-
-				var bgTrees:FlxSprite = new FlxSprite(repositionShit - 380, -800);
-				bgTrees.frames = Paths.getPackerAtlas('weeb/weebTrees');
-				bgTrees.animation.add('treeLoop', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 12);
-				bgTrees.animation.play('treeLoop');
-				bgTrees.scrollFactor.set(0.85, 0.85);
-				add(bgTrees);
-				bgTrees.antialiasing = false;
-
-				if(!ClientPrefs.lowQuality) {
-					var treeLeaves:BGSprite = new BGSprite('weeb/petals', repositionShit, -40, 0.85, 0.85, ['PETALS ALL'], true);
-					treeLeaves.setGraphicSize(widShit);
-					treeLeaves.updateHitbox();
-					add(treeLeaves);
-					treeLeaves.antialiasing = false;
-				}
-
-				bgSky.setGraphicSize(widShit);
-				bgSchool.setGraphicSize(widShit);
-				bgStreet.setGraphicSize(widShit);
-				bgTrees.setGraphicSize(Std.int(widShit * 1.4));
-
-				bgSky.updateHitbox();
-				bgSchool.updateHitbox();
-				bgStreet.updateHitbox();
-				bgTrees.updateHitbox();
-
-				if(!ClientPrefs.lowQuality) {
-					bgGirls = new BackgroundGirls(-100, 190);
-					bgGirls.scrollFactor.set(0.9, 0.9);
-
-					if (SONG.song.toLowerCase() == 'roses') {
-						bgGirls.getScared();
-					}
-
-					bgGirls.setGraphicSize(Std.int(bgGirls.width * daPixelZoom));
-					bgGirls.updateHitbox();
-					add(bgGirls);
-				}
-
-			case 'thorns':
-				curStage = 'schoolEvil';
-
-				if(!ClientPrefs.lowQuality) { //Does this even do something?
-					var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
-					var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
-				}
-
-				var posX = 400;
-				var posY = 200;
-				if(!ClientPrefs.lowQuality) {
-					var bg:BGSprite = new BGSprite('weeb/animatedEvilSchool', posX, posY, 0.8, 0.9, ['background 2'], true);
-					bg.scale.set(6, 6);
-					bg.antialiasing = false;
-					add(bg);
-
-					bgGhouls = new BGSprite('weeb/bgGhouls', -100, 190, 0.9, 0.9, ['BG freaks glitch instance'], false);
-					bgGhouls.setGraphicSize(Std.int(bgGhouls.width * daPixelZoom));
-					bgGhouls.updateHitbox();
-					bgGhouls.visible = false;
-					bgGhouls.antialiasing = false;
-					add(bgGhouls);
-				} else {
-					var bg:BGSprite = new BGSprite('weeb/animatedEvilSchool_low', posX, posY, 0.8, 0.9);
-					bg.scale.set(6, 6);
-					bg.antialiasing = false;
-					add(bg);
-				}
-
+				var stageFront:BGSprite = new BGSprite(Paths.image('cirnofloor', 'cirnoweek'), -425, -330, 0.9, 0.9);
+				stageFront.setGraphicSize(Std.int(stageFront.width * 1.15));
+				stageFront.updateHitbox();
+				add(stageFront);	
 			default:
 				defaultCamZoom = 0.9;
 				curStage = 'stage';
@@ -680,7 +442,7 @@ class PlayState extends MusicBeatState
 				add(evilTrail);
 		}
 
-		add(gfGroup);
+		//add(gfGroup);
 
 		// Shitty layering but whatev it works LOL
 		if (curStage == 'limo')
@@ -2022,6 +1784,178 @@ class PlayState extends MusicBeatState
 					// FlxG.sound.music.stop();
 					// MusicBeatState.switchState(new PlayState());
 			}
+		}
+
+		if(curSong == "Chirumiru")
+		{
+			switch (curBeat)
+				{
+					case 48:
+						defaultCamZoom = 1.05;
+
+					case 50:
+						defaultCamZoom = 1.07;
+						
+					case 52:
+						defaultCamZoom = 1.09;
+						
+					case 54:
+						defaultCamZoom = 1.11;
+						
+					case 56:
+						defaultCamZoom = 1.13;
+						
+					case 58:
+						defaultCamZoom = 1.16;
+						
+					case 60:
+						defaultCamZoom = 1.18;
+						
+					case 64:
+						defaultCamZoom = 1.20;
+						
+					case 66:
+						defaultCamZoom = 1.35;
+						
+					case 68:
+						defaultCamZoom = 1.15;
+						
+					case 70:
+						defaultCamZoom = 1.25;
+						
+					case 72:
+						defaultCamZoom = 1.07;
+														
+					case 74:
+						defaultCamZoom = 1.15;
+																						
+					case 76:
+						defaultCamZoom = 1.3;
+																						
+					case 77:
+						defaultCamZoom = 1.2;
+																						
+					case 78:
+						defaultCamZoom = 1.1;
+																						
+					case 79:
+						defaultCamZoom = 1.0;
+
+					case 80:
+						defaultCamZoom = 1.0;
+						cirnoMode = true;
+						cirnoMode == true;
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 84:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 88:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 96:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 104:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 112:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 116:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 120:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 128:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 132:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 136:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 148:
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+						cirnoMode = false;
+						cirnoMode == false;
+
+					case 280:
+						cirnoMode = true;
+						cirnoMode == true;
+
+					case 293:
+						defaultCamZoom = 1.7;
+
+					case 296:
+						defaultCamZoom = 1.0;
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 300:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 304:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 312:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 316:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 320:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 328:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 332:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 336:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 344:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 348:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+
+					case 352:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+
+					case 360:
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+						cirnoMode = false;
+						cirnoMode == false;
+				}
 		}
 		// better streaming of shit
 
