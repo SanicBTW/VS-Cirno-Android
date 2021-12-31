@@ -135,8 +135,8 @@
 		{
 			"loop": false,
 			"offsets": [
-				37,
-				11
+				404,
+				444
 			],
 			"anim": "firstDeath",
 			"fps": 24,
@@ -146,8 +146,8 @@
 		{
 			"loop": true,
 			"offsets": [
-				37,
-				5
+				176,
+				444
 			],
 			"anim": "deathLoop",
 			"fps": 24,
@@ -157,8 +157,8 @@
 		{
 			"loop": false,
 			"offsets": [
-				37,
-				69
+				176,
+				444
 			],
 			"anim": "deathConfirm",
 			"fps": 24,
@@ -167,10 +167,10 @@
 		}
 	],
 	"no_antialiasing": false,
-	"image": "characters/BOYFRIEND",
+	"image": "characters/chirumiru/BOYFRIENDCIRNO",
 	"position": [
 		0,
-		350
+		260
 	],
 	"healthicon": "bf",
 	"flip_x": true,
@@ -180,8 +180,8 @@
 		209
 	],
 	"camera_position": [
-		0,
-		0
+		190,
+		-210
 	],
 	"sing_duration": 4,
 	"scale": 1
