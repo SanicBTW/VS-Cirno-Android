@@ -23,7 +23,7 @@ class FreeplayState extends MusicBeatState
 {
 	//Character head icons for your songs
 	static var songsHeads:Array<Dynamic> = [
-		['bf'],							//Week 1
+		['cirno'],							//Week 1
 	];
 
 	var songs:Array<SongMetadata> = [];
@@ -54,13 +54,14 @@ class FreeplayState extends MusicBeatState
 	{
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
+		/*
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 		for (i in 0...initSonglist.length)
 		{
 			var songArray:Array<String> = initSonglist[i].split(":");
 			addSong(songArray[0], 0, songArray[1]);
 			songs[songs.length-1].color = Std.parseInt(songArray[2]);
-		}
+		}*/
 		var colorsList = CoolUtil.coolTextFile(Paths.txt('freeplayColors'));
 		for (i in 0...colorsList.length)
 		{

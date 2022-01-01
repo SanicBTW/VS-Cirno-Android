@@ -30,7 +30,7 @@ class WeekData {
 	//Oh yeah, quick reminder that files inside the folder that ends with _high are only loaded
 	//if you have the Low Quality option disabled on "Preferences"
 	public static var loadDirectory:Array<String> = [
-		'tutorial', //Tutorial loads "tutorial" folder on assets/
+		null, //Tutorial loads "tutorial" folder on assets/
 		'cirnoweek',	//Week 1
 		null,	//Week 2
 		null,	//Week 3
