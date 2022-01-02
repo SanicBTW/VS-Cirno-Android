@@ -3037,12 +3037,13 @@ class PlayState extends MusicBeatState
 					}
 				}
 
+				/*
 				#if ACHIEVEMENTS_ALLOWED
 				var achieve:String = checkForAchievement(['oversinging']);
 				if (achieve != null) {
 					startAchievement(achieve);
 				}
-				#end
+				#end*/
 			} else if (boyfriend.holdTimer > Conductor.stepCrochet * 0.001 * boyfriend.singDuration && boyfriend.animation.curAnim.name.startsWith('sing')
 			&& !boyfriend.animation.curAnim.name.endsWith('miss'))
 				boyfriend.dance();
@@ -3163,7 +3164,7 @@ class PlayState extends MusicBeatState
 
 				if(!boyfriend.stunned)
 				{
-					noteMiss(note.noteData);
+					noteMiss(note);
 					if(!endingSong)
 					{
 						--songMisses;
@@ -3260,7 +3261,7 @@ class PlayState extends MusicBeatState
 
 			var isSus:Bool = note.isSustainNote; //GET OUT OF MY HEAD, GET OUT OF MY HEAD, GET OUT OF MY HEAD
 			var leData:Int = Math.round(Math.abs(note.noteData));
-			var leType:String = note.noteType;
+			var leType:Int = note.noteType;
 			callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
 
 			if (!note.isSustainNote)
