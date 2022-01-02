@@ -19,6 +19,15 @@ class Config {
 
 	**/
 
+	// ghost tapping
+	public var ghostTapping(get, set):Bool;
+
+	function get_ghostTapping():Bool
+		return getghostTapping();
+
+	function set_ghostTapping(ghostTapping:Bool):Bool
+		return setghostTapping(ghostTapping);
+
 	// downscroll
 	public var downscroll(get, set):Bool;
 	
@@ -57,6 +66,14 @@ class Config {
 	}
 
 	// --- old config
+	public function setghostTapping(?value:Bool):Bool {
+		if(save.data.ghostTapping == null) save.data.ghostTapping = false;
+
+		save.data.ghostTapping = !save.data.ghostTapping;
+		save.flush();
+		return save.data.ghostTapping;
+	}
+
 	public function setdownscroll(?value:Bool):Bool {
 		if (save.data.isdownscroll == null) save.data.isdownscroll = false;
 		
@@ -96,6 +113,11 @@ class Config {
 		else {
 			return 0.06;
 		}
+	}
+
+	public function getghostTapping():Bool {
+		if (save.data.ghostTapping != null) return save.data.ghostTapping;
+		return false;
 	}
 
 	public function getdownscroll():Bool {
