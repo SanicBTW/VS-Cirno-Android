@@ -195,6 +195,7 @@ class PlayState extends MusicBeatState
 	public var songScore:Int = 0;
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
+	public var ghostMisses:Int = 0;
 	public var scoreTxt:FlxText;
 	var timeTxt:FlxText;
 	var scoreTxtTween:FlxTween;
@@ -3076,8 +3077,7 @@ class PlayState extends MusicBeatState
 			}
 		});
 
-		health -= daNote.missHealth; //For testing purposes
-		//trace(daNote.missHealth);
+		health -= 0.04;
 		songMisses++;
 		vocals.volume = 0;
 		RecalculateRating();
@@ -3154,30 +3154,44 @@ class PlayState extends MusicBeatState
 	{
 		if (!note.wasGoodHit)
 		{
-			if(cpuControlled && (note.ignoreNote || note.hitCausesMiss)) return;
+			if(cpuControlled && (note.ignoreNote)) return;
 
-			if(note.hitCausesMiss) {
-				noteMiss(note);
-				if(!note.noteSplashDisabled && !note.isSustainNote) {
-					spawnNoteSplashOnNote(note);
-				}
+			switch(note.noteType)
+			{
+				case 3: //Hurt note
+				if(cpuControlled) return;
 
-				switch(note.noteType) {
-					case 3: //Hurt note
+				if(!boyfriend.stunned)
+				{
+					noteMiss(note.noteData);
+					if(!endingSong)
+					{
+						--songMisses;
+						RecalculateRating();
+						if(!note.isSustainNote) {
+							health -= 0.26; //0.26 + 0.04 = -0.3 (-15%) of HP if you hit a hurt note
+							spawnNoteSplashOnNote(note);
+						}
+						else health -= 0.06; //0.06 + 0.04 = -0.1 (-5%) of HP if you hit a hurt sustain note
+
 						if(boyfriend.animation.getByName('hurt') != null) {
 							boyfriend.playAnim('hurt', true);
 							boyfriend.specialAnim = true;
 						}
-				}
-				
-				note.wasGoodHit = true;
-				if (!note.isSustainNote)
-				{
-					note.kill();
-					notes.remove(note, true);
-					note.destroy();
+					}
+
+					note.wasGoodHit = true;
+					vocals.volume = 0;
+
+					if (!note.isSustainNote)
+					{
+						note.kill();
+						notes.remove(note, true);
+						note.destroy();
+					}
 				}
 				return;
+
 			}
 
 			if (!note.isSustainNote)
@@ -3186,45 +3200,43 @@ class PlayState extends MusicBeatState
 				combo += 1;
 				if(combo > 9999) combo = 9999;
 			}
-			health += note.hitHealth;
+			health += 0.023; //???? have to check this or something lol
 
-			if(!note.noAnimation) {
-				var daAlt = '';
-				if(note.noteType == 1) daAlt = '-alt';
-	
-				var animToPlay:String = '';
-				switch (Std.int(Math.abs(note.noteData)))
-				{
-					case 0:
-						animToPlay = 'singLEFT';
-					case 1:
-						animToPlay = 'singDOWN';
-					case 2:
-						animToPlay = 'singUP';
-					case 3:
-						animToPlay = 'singRIGHT';
+			var daAlt = '';
+			if(note.noteType == 1) daAlt = '-alt';
+
+			var animToPlay:String = '';
+			switch (Std.int(Math.abs(note.noteData)))
+			{
+				case 0:
+					animToPlay = 'singLEFT';
+				case 1:
+					animToPlay = 'singDOWN';
+				case 2:
+					animToPlay = 'singUP';
+				case 3:
+					animToPlay = 'singRIGHT';
+			}
+
+			if(note.noteType == 6) {
+				gf.playAnim(animToPlay + daAlt, true);
+				gf.holdTimer = 0;
+			} else {
+				boyfriend.playAnim(animToPlay + daAlt, true);
+				boyfriend.holdTimer = 0;
+			}
+
+			if(note.noteType == 2) {
+				if(boyfriend.animOffsets.exists('hey')) {
+					boyfriend.playAnim('hey', true);
+					boyfriend.specialAnim = true;
+					boyfriend.heyTimer = 0.6;
 				}
 
-				if(note.noteType == 6) {
-					gf.playAnim(animToPlay + daAlt, true);
-					gf.holdTimer = 0;
-				} else {
-					boyfriend.playAnim(animToPlay + daAlt, true);
-					boyfriend.holdTimer = 0;
-				}
-
-				if(note.noteType == 2) {
-					if(boyfriend.animOffsets.exists('hey')) {
-						boyfriend.playAnim('hey', true);
-						boyfriend.specialAnim = true;
-						boyfriend.heyTimer = 0.6;
-					}
-	
-					if(gf.animOffsets.exists('cheer')) {
-						gf.playAnim('cheer', true);
-						gf.specialAnim = true;
-						gf.heyTimer = 0.6;
-					}
+				if(gf.animOffsets.exists('cheer')) {
+					gf.playAnim('cheer', true);
+					gf.specialAnim = true;
+					gf.heyTimer = 0.6;
 				}
 			}
 
