@@ -897,8 +897,10 @@ class PreferencesSubstate extends MusicBeatSubstate
 						ClientPrefs.hideTime = !ClientPrefs.hideTime;
 					
 					case 'No Miss':
+						ClientPrefs.chirumiruNoMiss = !ClientPrefs.chirumiruNoMiss;
 
 					case 'Death Notes Insta Kill':
+						ClientPrefs.chirumiruDeathNotesInsta = !ClientPrefs.chirumiruDeathNotesInsta;
 
 				}
 				FlxG.sound.play(Paths.sound('scrollMenu'));
