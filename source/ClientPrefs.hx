@@ -23,7 +23,7 @@ class ClientPrefs {
 	public static var noteOffset:Int = 0;
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
 	public static var imagesPersist:Bool = false;
-	public static var ghostTapping:Bool = true;
+	public static var ghostTapping:Bool = false;
 	public static var hideTime:Bool = false;
 	public static var chirumiruNoMiss = false;
 	public static var chirumiruDeathNotesInsta = false;

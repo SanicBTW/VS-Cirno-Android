@@ -6,7 +6,7 @@ class WeekData {
 	//Go to StoryMenuState.hx and add the characters/backgrounds
 	public static var songsNames:Array<Dynamic> = [
 		[],								//Tutorial, this one isn't added to Freeplay, instead it is added from assets/preload/freeplaySonglist.txt
-		['Chirumiru'],			//Week 1
+		['Chirumiru', 'Chirumiru', 'Chirumiru', 'Chirumiru', 'Chirumiru'],			//Week 1
 	];
 
 	// Custom week number, used for your week's score not being overwritten by a new vanilla week when the game updates
