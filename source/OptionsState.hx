@@ -1078,6 +1078,10 @@ class PreferencesSubstate extends MusicBeatSubstate
 						daValue = ClientPrefs.imagesPersist;
 					case 'Hide Song Length':
 						daValue = ClientPrefs.hideTime;
+					case 'No Miss':
+						daValue = ClientPrefs.chirumiruNoMiss;
+					case 'Death Notes Insta Kill':
+						daValue = ClientPrefs.chirumiruDeathNotesInsta;		
 				}
 				checkbox.daValue = daValue;
 			}
