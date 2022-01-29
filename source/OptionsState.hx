@@ -678,7 +678,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 	private static var curSelected:Int = 0;
 	static var unselectableOptions:Array<String> = [
 		'GRAPHICS',
-		'GAMEPLAY'
+		'GAMEPLAY',
+		"Chirumiru Options"
 	];
 	static var noCheckbox:Array<String> = [
 		'Framerate',
@@ -706,6 +707,9 @@ class PreferencesSubstate extends MusicBeatSubstate
 		#if !mobile
 		,'FPS Counter'
 		#end
+		,'Chirumiru Options',
+		'No Miss',
+		'Death Notes Insta Kill'
 	];
 
 	private var grpOptions:FlxTypedGroup<Alphabet>;
@@ -891,6 +895,11 @@ class PreferencesSubstate extends MusicBeatSubstate
 
 					case 'Hide Song Length':
 						ClientPrefs.hideTime = !ClientPrefs.hideTime;
+					
+					case 'No Miss':
+
+					case 'Death Notes Insta Kill':
+
 				}
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				reloadValues();
