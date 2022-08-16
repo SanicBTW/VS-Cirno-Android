@@ -1,5 +1,6 @@
 package;
 
+import flixel.addons.transition.FlxTransitionableState;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -25,16 +26,12 @@ import flixel.input.keyboard.FlxKey;
 import flixel.graphics.FlxGraphic;
 import Controls;
 
-import options.CustomControlsState;
-import options.AboutState;
-import ui.FlxVirtualPad;
-
 using StringTools;
 
 // TO DO: Redo the menu creation system for not being as dumb
 class OptionsState extends MusicBeatState
 {
-	var options:Array<String> = ['Mobile Controls', 'Notes', 'Preferences' ];
+	var options:Array<String> = ['Notes', #if android 'Mobile Controls' , #end 'Controls', 'Preferences'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
@@ -44,8 +41,7 @@ class OptionsState extends MusicBeatState
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 
-		menuBG = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		menuBG.color = 0xFFea71fd;
+		menuBG = new FlxSprite().loadGraphic(Paths.image('menuBGBlue'));
 		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
 		menuBG.updateHitbox();
 		menuBG.screenCenter();
@@ -64,13 +60,17 @@ class OptionsState extends MusicBeatState
 		}
 		changeSelection();
 
-		addVirtualPad(FULL, A_B);
+		#if android
+		addVirtualPad(LEFT_FULL, A_B);
+		#end
 
 		super.create();
 	}
 
 	override function closeSubState() {
 		super.closeSubState();
+		FlxTransitionableState.skipNextTransOut = true;
+		FlxG.resetState();
 		ClientPrefs.saveSettings();
 		changeSelection();
 	}
@@ -91,22 +91,25 @@ class OptionsState extends MusicBeatState
 		}
 
 		if (controls.ACCEPT) {
+			#if android
+			removeVirtualPad();
+			#end
 			for (item in grpOptions.members) {
 				item.alpha = 0;
 			}
 
 			switch(options[curSelected]) {
-				case 'Preferences':
-					openSubState(new PreferencesSubstate());
-
 				case 'Notes':
 					openSubState(new NotesSubstate());
 
 				case 'Mobile Controls':
-					MusicBeatState.switchState(new options.CustomControlsState());
+					openSubState(new android.AndroidControlsSubState());
 
-				case 'About':
-					MusicBeatState.switchState(new options.AboutState());
+				case 'Controls':
+					openSubState(new ControlsSubstate());
+
+				case 'Preferences':
+					openSubState(new PreferencesSubstate());
 			}
 		}
 	}
@@ -188,12 +191,11 @@ class NotesSubstate extends MusicBeatSubstate
 		}
 		hsvText = new Alphabet(0, 0, "Hue    Saturation  Brightness", false, false, 0, 0.65);
 		add(hsvText);
-		
-		#if mobileC
-        addVirtualPad(FULL, A_B);
-        #end
-		
 		changeSelection();
+
+		#if android
+		addVirtualPad(LEFT_FULL, A_B);
+		#end
 	}
 
 	var changingNote:Bool = false;
@@ -469,6 +471,10 @@ class ControlsSubstate extends MusicBeatSubstate {
 			}
 		}
 		changeSelection();
+
+		#if android
+		addVirtualPad(LEFT_FULL, A_B);
+		#end
 	}
 
 	var leaving:Bool = false;
@@ -679,7 +685,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 	static var unselectableOptions:Array<String> = [
 		'GRAPHICS',
 		'GAMEPLAY',
-		"Chirumiru Options"
+		'OPTIMIZATION'
 	];
 	static var noCheckbox:Array<String> = [
 		'Framerate',
@@ -689,8 +695,9 @@ class PreferencesSubstate extends MusicBeatSubstate
 	static var options:Array<String> = [
 		'GRAPHICS',
 		'Low Quality',
-		//'Anti-Aliasing',
-		'Persistent Cached Data',
+		'Anti-Aliasing',
+		'FPS Counter',
+		'Memory Counter',
 		#if !html5
 		'Framerate', //Apparently 120FPS isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
 		#end
@@ -699,17 +706,15 @@ class PreferencesSubstate extends MusicBeatSubstate
 		'Middlescroll',
 		'Ghost Tapping',
 		'Note Delay',
-		'Note Splashes',
 		'Hide HUD',
 		'Hide Song Length',
 		'Flashing Lights',
-		'Camera Zooms'
-		#if !mobile
-		,'FPS Counter'
-		#end
-		,'Chirumiru Options',
-		'No Miss',
-		'Death Notes Insta Kill'
+		'Camera Zooms',
+		'Snap Camera on Note P',
+		'OPTIMIZATION',
+		'Only Notes',
+		'Disable score tween',
+		'Hide Health Bar'
 	];
 
 	private var grpOptions:FlxTypedGroup<Alphabet>;
@@ -786,13 +791,12 @@ class PreferencesSubstate extends MusicBeatSubstate
 				break;
 			}
 		}
-		
-		#if mobileC
-        addVirtualPad(FULL, A_B);
-        #end
-		
 		changeSelection();
 		reloadValues();
+
+		#if android
+		addVirtualPad(LEFT_FULL, A_B);
+		#end
 	}
 
 	var nextAccept:Int = 5;
@@ -895,13 +899,20 @@ class PreferencesSubstate extends MusicBeatSubstate
 
 					case 'Hide Song Length':
 						ClientPrefs.hideTime = !ClientPrefs.hideTime;
-					
-					case 'No Miss':
-						ClientPrefs.chirumiruNoMiss = !ClientPrefs.chirumiruNoMiss;
 
-					case 'Death Notes Insta Kill':
-						ClientPrefs.chirumiruDeathNotesInsta = !ClientPrefs.chirumiruDeathNotesInsta;
+					case 'Memory Counter':
+						ClientPrefs.showMemory = !ClientPrefs.showMemory;
+						if(Main.memoryVar != null)
+							Main.memoryVar.visible = ClientPrefs.showMemory;
 
+					case 'Only Notes':
+						ClientPrefs.optOnlyNotes = !ClientPrefs.optOnlyNotes;
+					case 'Disable score tween':
+						ClientPrefs.optDisableScoreTween = !ClientPrefs.optDisableScoreTween;
+					case 'Hide Health Bar':
+						ClientPrefs.optHideHealthBar = !ClientPrefs.optHideHealthBar;
+					case 'Snap Camera on Note P':
+						ClientPrefs.snapCameraOnNote = !ClientPrefs.snapCameraOnNote;
 				}
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				reloadValues();
@@ -913,7 +924,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 				switch(options[curSelected]) {
 					case 'Framerate':
 						ClientPrefs.framerate += add;
-						if(ClientPrefs.framerate < 60) ClientPrefs.framerate = 60;
+						if(ClientPrefs.framerate < 30) ClientPrefs.framerate = 30;
 						else if(ClientPrefs.framerate > 240) ClientPrefs.framerate = 240;
 
 						if(ClientPrefs.framerate > FlxG.drawFramerate) {
@@ -995,6 +1006,17 @@ class PreferencesSubstate extends MusicBeatSubstate
 				daText = "If checked, hides most HUD elements.";
 			case 'Hide Song Length':
 				daText = "If checked, the bar showing how much time is left\nwill be hidden.";
+			case "Memory Counter":
+				daText = "Displays a memory counter";
+			
+			case 'Only Notes':
+				daText = 'Hides characters, and sets middlescroll';
+			case 'Disable score tween':
+				daText = 'Disables score bop on sick';
+			case 'Hide Health Bar':
+				daText = 'Hides health bar and replaces it with a percentage';
+			case 'Snap Camera on Note P':
+				daText = 'Snaps the camera on the note direction';
 		}
 		descText.text = daText;
 
@@ -1078,10 +1100,16 @@ class PreferencesSubstate extends MusicBeatSubstate
 						daValue = ClientPrefs.imagesPersist;
 					case 'Hide Song Length':
 						daValue = ClientPrefs.hideTime;
-					case 'No Miss':
-						daValue = ClientPrefs.chirumiruNoMiss;
-					case 'Death Notes Insta Kill':
-						daValue = ClientPrefs.chirumiruDeathNotesInsta;		
+					case 'Memory Counter':
+						daValue = ClientPrefs.showMemory;
+					case 'Only Notes':
+						daValue = ClientPrefs.optOnlyNotes;
+					case 'Disable score tween':
+						daValue = ClientPrefs.optDisableScoreTween;
+					case 'Hide Health Bar':
+						daValue = ClientPrefs.optHideHealthBar;
+					case 'Snap Camera on Note P':
+						daValue = ClientPrefs.snapCameraOnNote;
 				}
 				checkbox.daValue = daValue;
 			}

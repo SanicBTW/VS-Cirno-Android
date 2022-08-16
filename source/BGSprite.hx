@@ -21,7 +21,7 @@ class BGSprite extends FlxSprite
 			}
 		} else {
 			if(image != null) {
-				loadGraphic(Paths.image(image, 'cirnoweek'));
+				loadGraphic(Paths.image(image));
 			}
 			active = false;
 		}

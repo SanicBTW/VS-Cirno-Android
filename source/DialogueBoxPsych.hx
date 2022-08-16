@@ -148,19 +148,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			bgFade.alpha += 0.5 * elapsed;
 			if(bgFade.alpha > 0.5) bgFade.alpha = 0.5;
 
-		#if mobile
-		var justTouched:Bool = false;
-
-		for (touch in FlxG.touches.list)
-		{
-			justTouched = false;
-			
-			if (touch.justReleased){
-				justTouched = true;
-			}
-		}
-		#end
-		if (FlxG.keys.justPressed.ANY #if mobile || justTouched #end) {
+			if(FlxG.keys.justPressed.ANY) {
 				if(!daText.finishedText) {
 					if(daText != null) {
 						daText.killTheTimer();

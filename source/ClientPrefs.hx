@@ -23,10 +23,16 @@ class ClientPrefs {
 	public static var noteOffset:Int = 0;
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
 	public static var imagesPersist:Bool = false;
-	public static var ghostTapping:Bool = false;
+	public static var ghostTapping:Bool = true;
 	public static var hideTime:Bool = false;
-	public static var chirumiruNoMiss = false;
-	public static var chirumiruDeathNotesInsta = false;
+
+	public static var showMemory:Bool = true;
+	public static var optOnlyNotes:Bool = false;
+	public static var optDisableScoreTween:Bool = false;
+	public static var optHideHealthBar:Bool = false;
+	public static var snapCameraOnNote:Bool = true;
+
+	public static var serverURL:String = null; //dont save this one
 
 	public static var defaultKeys:Array<FlxKey> = [
 		A, LEFT,			//Note Left
@@ -82,17 +88,13 @@ class ClientPrefs {
 		FlxG.save.data.imagesPersist = imagesPersist;
 		FlxG.save.data.ghostTapping = ghostTapping;
 		FlxG.save.data.hideTime = hideTime;
-		FlxG.save.data.chirumiruNoMiss = chirumiruNoMiss;
-		FlxG.save.data.chirumiruDeathNotesInsta = chirumiruDeathNotesInsta;
+		
+		FlxG.save.data.showMemory = showMemory;
+		FlxG.save.data.optOnlyNotes = optOnlyNotes;
+		FlxG.save.data.optDisableScoreTween = optDisableScoreTween;
+		FlxG.save.data.optHideHealthBar = optHideHealthBar;
+		FlxG.save.data.snapCameraOnNote = snapCameraOnNote;
 
-		var achieves:Array<String> = [];
-		for (i in 0...Achievements.achievementsUnlocked.length) {
-			if(Achievements.achievementsUnlocked[i][1]) {
-				achieves.push(Achievements.achievementsUnlocked[i][0]);
-			}
-		}
-		FlxG.save.data.achievementsUnlocked = achieves;
-		FlxG.save.data.henchmenDeath = Achievements.henchmenDeath;
 		FlxG.save.flush();
 
 		var save:FlxSave = new FlxSave();
@@ -165,11 +167,22 @@ class ClientPrefs {
 		if(FlxG.save.data.hideTime != null) {
 			hideTime = FlxG.save.data.hideTime;
 		}
-		if(FlxG.save.data.chirumiruNoMiss != null){
-			chirumiruNoMiss = FlxG.save.data.chirumiruNoMiss;
+
+		if(FlxG.save.data.showMemory != null) {
+			showMemory = FlxG.save.data.showMemory;
 		}
-		if(FlxG.save.data.chirumiruDeathNotesInsta != null){
-			chirumiruDeathNotesInsta = FlxG.save.data.chirumiruDeathNotesInsta;
+
+		if(FlxG.save.data.optOnlyNotes != null) { 
+			optOnlyNotes = FlxG.save.data.optOnlyNotes;
+		}
+		if(FlxG.save.data.optDisableScoreTween != null) {
+			optDisableScoreTween = FlxG.save.data.optDisableScoreTween;
+		}
+		if(FlxG.save.data.optHideHealthBar != null) {
+			optHideHealthBar = FlxG.save.data.optHideHealthBar;
+		}
+		if(FlxG.save.data.snapCameraOnNote != null) {
+			snapCameraOnNote = FlxG.save.data.snapCameraOnNote;
 		}
 
 		var save:FlxSave = new FlxSave();

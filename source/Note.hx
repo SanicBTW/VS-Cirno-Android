@@ -19,11 +19,12 @@ class Note extends FlxSprite
 	public var tooLate:Bool = false;
 	public var wasGoodHit:Bool = false;
 	public var ignoreNote:Bool = false;
+	public var hitByOpponent:Bool = false;
 	public var prevNote:Note;
 
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
-	public var noteType(default, set):Int = 0;
+	public var noteType(default, set):String = null;
 
 	public var eventName:String = '';
 	public var eventVal1:String = '';
@@ -31,6 +32,7 @@ class Note extends FlxSprite
 
 	public var colorSwap:ColorSwap;
 	public var inEditor:Bool = false;
+	public var gfNote:Bool = false;
 
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
@@ -38,15 +40,20 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
-	private function set_noteType(value:Int):Int {
+	public var noAnimation:Bool = false;
+
+	private function set_noteType(value:String):String {
 		if(noteData > -1 && noteType != value) {
 			switch(value) {
-				case 3: //Hurt note
-					reloadNote('HURT');
+				case "Cirno Note":
+					reloadNote('CIRNO');
 					colorSwap.hue = 0;
 					colorSwap.saturation = 0;
 					colorSwap.brightness = 0;
-
+				case 'No Animation':
+					noAnimation = true;
+				case 'GF Sing':
+					gfNote = true;
 				default:
 					colorSwap.hue = ClientPrefs.arrowHSV[noteData % 4][0] / 360;
 					colorSwap.saturation = ClientPrefs.arrowHSV[noteData % 4][1] / 100;
@@ -77,45 +84,17 @@ class Note extends FlxSprite
 
 		this.noteData = noteData;
 
-		var daStage:String = PlayState.curStage;
-
-		switch (daStage)
-		{
-			case 'school' | 'schoolEvil':
-				if (isSustainNote)
-				{
-					loadGraphic(Paths.image('weeb/pixelUI/NOTE_assetsENDS'));
-					width = width / 4;
-					height = height / 2;
-					loadGraphic(Paths.image('weeb/pixelUI/NOTE_assetsENDS'), true, Math.floor(width), Math.floor(height));
-				} else {
-					loadGraphic(Paths.image('weeb/pixelUI/NOTE_assets'));
-					width = width / 4;
-					height = height / 5;
-					loadGraphic(Paths.image('weeb/pixelUI/NOTE_assets'), true, Math.floor(width), Math.floor(height));
-				}
-				loadPixelNoteAnims();
-
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
-				updateHitbox();
-				isPixel = true;
-
-			default:
-				frames = Paths.getSparrowAtlas('NOTE_assets');
-				loadNoteAnims();
-				antialiasing = ClientPrefs.globalAntialiasing;
-		}
+		frames = Paths.getSparrowAtlas("NOTE_assets");
+		loadNoteAnims();
+		antialiasing = ClientPrefs.globalAntialiasing;
 
 		if(noteData > -1) {
 			colorSwap = new ColorSwap();
 			shader = colorSwap.shader;
-			
-			colorSwap.hue = ClientPrefs.arrowHSV[noteData % 4][0] / 360;
-			colorSwap.saturation = ClientPrefs.arrowHSV[noteData % 4][1] / 100;
-			colorSwap.brightness = ClientPrefs.arrowHSV[noteData % 4][2] / 100;
 
 			x += swagWidth * (noteData % 4);
-			if(!isSustainNote) { //Doing this 'if' check to fix the warnings on Senpai songs
+			if(!isSustainNote) 
+			{
 				var animToPlay:String = '';
 				switch (noteData % 4)
 				{
@@ -131,8 +110,6 @@ class Note extends FlxSprite
 				animation.play(animToPlay + 'Scroll');
 			}
 		}
-
-		// trace(prevNote);
 
 		if (isSustainNote && prevNote != null)
 		{
@@ -157,9 +134,6 @@ class Note extends FlxSprite
 
 			x -= width / 2;
 
-			if (PlayState.curStage.startsWith('school'))
-				x += 30;
-
 			if (prevNote.isSustainNote)
 			{
 				switch (prevNote.noteData)
@@ -176,18 +150,15 @@ class Note extends FlxSprite
 
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed;
 				prevNote.updateHitbox();
-				// prevNote.setGraphicSize();
 			}
 		}
 
 		if(!isPixel && noteData > -1) reloadNote();
 	}
 
-	function reloadNote(?prefix:String = '', ?suffix:String = '') {
-		var skin:String = PlayState.SONG.arrowSkin;
-		if(skin == null || skin.length < 1) {
-			skin = 'NOTE_assets';
-		}
+	function reloadNote(?prefix:String = '', ?suffix:String = '') 
+	{
+		var skin:String = "NOTE_assets";
 
 		var animName:String = null;
 		if(animation.curAnim != null) {
@@ -195,23 +166,9 @@ class Note extends FlxSprite
 		}
 
 		var blahblah:String = prefix + skin + suffix;
-		if(isPixel) {
-			if(isSustainNote) {
-				loadGraphic(Paths.image('weeb/pixelUI/' + blahblah + 'ENDS'));
-				width = width / 4;
-				height = height / 2;
-				loadGraphic(Paths.image('weeb/pixelUI/' + blahblah + 'ENDS'), true, Math.floor(width), Math.floor(height));
-			} else {
-				loadGraphic(Paths.image('weeb/pixelUI/' + blahblah));
-				width = width / 4;
-				height = height / 5;
-				loadGraphic(Paths.image('weeb/pixelUI/' + blahblah), true, Math.floor(width), Math.floor(height));
-			}
-			loadPixelNoteAnims();
-		} else {
-			frames = Paths.getSparrowAtlas(blahblah);
-			loadNoteAnims();
-		}
+		frames = Paths.getSparrowAtlas(blahblah);
+		loadNoteAnims();
+
 		animation.play(animName, true);
 
 		if(inEditor) {
@@ -241,25 +198,6 @@ class Note extends FlxSprite
 
 		setGraphicSize(Std.int(width * 0.7));
 		updateHitbox();
-	}
-
-	function loadPixelNoteAnims() {
-		if(isSustainNote) {
-			animation.add('purpleholdend', [PURP_NOTE + 4]);
-			animation.add('greenholdend', [GREEN_NOTE + 4]);
-			animation.add('redholdend', [RED_NOTE + 4]);
-			animation.add('blueholdend', [BLUE_NOTE + 4]);
-
-			animation.add('purplehold', [PURP_NOTE]);
-			animation.add('greenhold', [GREEN_NOTE]);
-			animation.add('redhold', [RED_NOTE]);
-			animation.add('bluehold', [BLUE_NOTE]);
-		} else {
-			animation.add('greenScroll', [GREEN_NOTE + 4]);
-			animation.add('redScroll', [RED_NOTE + 4]);
-			animation.add('blueScroll', [BLUE_NOTE + 4]);
-			animation.add('purpleScroll', [PURP_NOTE + 4]);
-		}
 	}
 
 	override function update(elapsed:Float)

@@ -37,11 +37,6 @@ import openfl.media.Sound;
 import openfl.net.FileReference;
 import openfl.utils.ByteArray;
 import openfl.utils.Assets as OpenFlAssets;
-
-//android
-import ui.FlxVirtualPad;
-// android
-
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
@@ -51,12 +46,15 @@ using StringTools;
 
 class ChartingState extends MusicBeatState
 {
-	private static var noteTypeList:Array<String> =
+	public static var noteTypeList:Array<String> =
 	[
 		'',
-		'1 - Alt Animation',
-		'2 - Hey!',
-		'3 - Hurt Note'
+		'Alt Animation',
+		'Hey!',
+		'Hurt Note',
+		'GF Sing',
+		'No Animation',
+		'Cirno Note'
 	];
 
 	private static var eventStuff:Array<Dynamic> =
@@ -125,11 +123,6 @@ class ChartingState extends MusicBeatState
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
-
-	//add buttons
-	var key_space:FlxButton;
-
-	var _pad:FlxVirtualPad;
 
 	var value1InputText:FlxUIInputText;
 	var value2InputText:FlxUIInputText;
@@ -249,6 +242,7 @@ class ChartingState extends MusicBeatState
 		var tipText:FlxText = new FlxText(UI_box.x, UI_box.y + UI_box.height + 6, 0,
 			"W/S or Mouse Wheel - Change Conductor's strum time
 			\nA or Left/D or Right - Go to the previous/next section
+			\nHold Shift to move 4x faster
 			\nHold Control and click on an arrow to select it
 			\nZ/X - Zoom in/out
 			\n
@@ -284,17 +278,6 @@ class ChartingState extends MusicBeatState
 		zoomTxt = new FlxText(10, 10, 0, "Zoom: 1x", 16);
 		zoomTxt.scrollFactor.set();
 		add(zoomTxt);
-
-		// add buttons
-		key_space = new FlxButton(60, 60, "");
-        key_space.loadGraphic(Paths.image("key_space")); //"assets/images/key_space.png"
-        key_space.alpha = 0.75;
-        add(key_space);
-
-		_pad = new FlxVirtualPad(FULL, NONE);
-    	_pad.alpha = 0.75;
-    	this.add(_pad);
-
 		super.create();
 	}
 
@@ -307,7 +290,6 @@ class ChartingState extends MusicBeatState
 	function addSongUI():Void
 	{
 		UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
-		UI_songTitle.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		blockPressWhileTypingOn.push(UI_songTitle);
 		
 		var check_voices = new FlxUICheckBox(10, 25, null, null, "Has voice track", 100);
@@ -429,11 +411,9 @@ class ChartingState extends MusicBeatState
 		var skin = PlayState.SONG.arrowSkin;
 		if(skin == null) skin = '';
 		noteSkinInputText = new FlxUIInputText(player2DropDown.x, player2DropDown.y + 50, 150, skin, 8);
-		noteSkinInputText.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		blockPressWhileTypingOn.push(noteSkinInputText);
 	
 		noteSplashesInputText = new FlxUIInputText(noteSkinInputText.x, noteSkinInputText.y + 35, 150, _song.splashSkin, 8);
-		noteSplashesInputText.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		blockPressWhileTypingOn.push(noteSplashesInputText);
 
 		var reloadNotesButton:FlxButton = new FlxButton(noteSplashesInputText.x + 5, noteSplashesInputText.y + 20, 'Change Notes', function() {
@@ -603,7 +583,6 @@ class ChartingState extends MusicBeatState
 		stepperSusLength.name = 'note_susLength';
 
 		strumTimeInputText = new FlxUIInputText(10, 65, 180, "0");
-		strumTimeInputText.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		tab_group_note.add(strumTimeInputText);
 		blockPressWhileTypingOn.push(strumTimeInputText);
 
@@ -656,13 +635,11 @@ class ChartingState extends MusicBeatState
 		var text:FlxText = new FlxText(20, 90, 0, "Value 1:");
 		tab_group_event.add(text);
 		value1InputText = new FlxUIInputText(20, 110, 100, "");
-		value1InputText.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		blockPressWhileTypingOn.push(value1InputText);
 
 		var text:FlxText = new FlxText(20, 130, 0, "Value 2:");
 		tab_group_event.add(text);
 		value2InputText = new FlxUIInputText(20, 150, 100, "");
-		value2InputText.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		blockPressWhileTypingOn.push(value2InputText);
 
 		tab_group_event.add(descText);
@@ -919,7 +896,7 @@ class ChartingState extends MusicBeatState
 	var lastConductorPos:Float;
 	var colorSine:Float = 0;
 	override function update(elapsed:Float)
-	{    
+	{
 		curStep = recalculateSteps();
 
 		if(FlxG.sound.music.time < 0) {
@@ -1025,28 +1002,14 @@ class ChartingState extends MusicBeatState
 
 		if (!blockInput)
 		{
-			#if android
-			var androidback = FlxG.android.justReleased.BACK;
-			#else
-			var androidback = false;
-			#end
-
-			if (FlxG.keys.justPressed.ENTER #if mobileC || androidback #end)
+			if (FlxG.keys.justPressed.ENTER)
 			{
+				autosaveSong();
 				FlxG.mouse.visible = false;
 				PlayState.SONG = _song;
 				FlxG.sound.music.stop();
 				if(vocals != null) vocals.stop();
 
-				var songName:String = PlayState.SONG.song.toLowerCase();
-				for (week in 0...WeekData.songsNames.length) {
-					var weekSongs:Array<String> = WeekData.songsNames[week];
-					for (i in 0...weekSongs.length) {
-						if(weekSongs[i].toLowerCase() == songName) {
-							PlayState.storyWeek = week;
-						}
-					}
-				}
 				LoadingState.loadAndSwitchState(new PlayState());
 			}
 
@@ -1086,7 +1049,7 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			if (FlxG.keys.justPressed.SPACE || key_space.justPressed)
+			if (FlxG.keys.justPressed.SPACE)
 			{
 				if (FlxG.sound.music.playing)
 				{
@@ -1123,55 +1086,48 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			if (!FlxG.keys.pressed.SHIFT)
+			if (FlxG.keys.pressed.W || FlxG.keys.pressed.S)
 			{
-				if (FlxG.keys.pressed.W || FlxG.keys.pressed.S || _pad.buttonUp.pressed || _pad.buttonDown.pressed)
+				FlxG.sound.music.pause();
+
+				var holdingShift:Float = FlxG.keys.pressed.SHIFT ? 3 : 1;
+				var daTime:Float = 700 * FlxG.elapsed * holdingShift;
+
+				if (FlxG.keys.pressed.W)
 				{
-					FlxG.sound.music.pause();
+					FlxG.sound.music.time -= daTime;
+				}
+				else
+					FlxG.sound.music.time += daTime;
+
+				if(vocals != null) {
 					vocals.pause();
-
-					var daTime:Float = 700 * FlxG.elapsed;
-
-					if (FlxG.keys.pressed.W || _pad.buttonUp.pressed)
-					{
-						FlxG.sound.music.time -= daTime;
-					}
-					else
-						FlxG.sound.music.time += daTime;
-
 					vocals.time = FlxG.sound.music.time;
 				}
 			}
-			else
-			{
-				if (FlxG.keys.justPressed.W || FlxG.keys.justPressed.S || _pad.buttonUp.pressed || _pad.buttonDown.pressed)
-				{
-					FlxG.sound.music.pause();
-					vocals.pause();
 
-					var daTime:Float = Conductor.stepCrochet * 2;
+			var shiftThing:Int = 1;
+			if (FlxG.keys.pressed.SHIFT)
+				shiftThing = 4;
 
-					if (FlxG.keys.justPressed.W || _pad.buttonUp.justPressed)
-					{
-						FlxG.sound.music.time -= daTime;
-					}
-					else
-						FlxG.sound.music.time += daTime;
-
-					vocals.time = FlxG.sound.music.time;
+			if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D)
+				changeSection(curSection + shiftThing);
+			if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A) {
+				if(curSection <= 0) {
+					changeSection(_song.notes.length-1);
+				} else {
+					changeSection(curSection - shiftThing);
+				}
+			}
+		} else if (FlxG.keys.justPressed.ENTER) {
+			for (i in 0...blockPressWhileTypingOn.length) {
+				if(blockPressWhileTypingOn[i].hasFocus) {
+					blockPressWhileTypingOn[i].hasFocus = false;
 				}
 			}
 		}
 
 		_song.bpm = tempBpm;
-
-		var shiftThing:Int = 1;
-		if (FlxG.keys.pressed.SHIFT)
-			shiftThing = 4;
-		if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D || _pad.buttonRight.justPressed)
-			changeSection(curSection + shiftThing);
-		if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A || _pad.buttonLeft.justPressed)
-			changeSection(curSection - shiftThing);
 
 		if(FlxG.sound.music.time < 0) {
 			FlxG.sound.music.pause();
@@ -1397,11 +1353,11 @@ class ChartingState extends MusicBeatState
 		var characterPath:String = 'characters/' + char + '.json';
 		#if MODS_ALLOWED
 		var path:String = Paths.mods(characterPath);
-		if (!Utils.existsCheck(path)) {
+		if (!FileSystem.exists(path)) {
 			path = Paths.getPreloadPath(characterPath);
 		}
 
-		if (!Utils.existsCheck(path))
+		if (!FileSystem.exists(path))
 		#else
 		var path:String = Paths.getPreloadPath(characterPath);
 		if (!OpenFlAssets.exists(path))
@@ -1410,7 +1366,7 @@ class ChartingState extends MusicBeatState
 			path = Paths.getPreloadPath('characters/' + Character.DEFAULT_CHARACTER + '.json'); //If a character couldn't be found, change him to BF just to prevent a crash
 		}
 
-		#if windows
+		#if MODS_ALLOWED
 		var rawJson = File.getContent(path);
 		#else
 		var rawJson = OpenFlAssets.getText(path);
@@ -1497,7 +1453,7 @@ class ChartingState extends MusicBeatState
 				curRenderedNoteType.add(daText);
 				daText.sprTracker = note;
 			} else {
-				if(note.noteType != 0 && i[3] != null) {
+				if(i[3] != null && note.noteType != null && note.noteType.length > 0) {
 					var daText:AttachedFlxText = new AttachedFlxText(0, 0, 100, Std.string(note.noteType), 24);
 					daText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 					daText.xAdd = -32;
@@ -1738,9 +1694,7 @@ class ChartingState extends MusicBeatState
 			"song": _song
 		};
 
-		var data:String = Json.stringify(json);
-
-		openfl.system.System.setClipboard(data.trim());
+    var data:String = Json.stringify(json, "\t");
 
 		if ((data != null) && (data.length > 0))
 		{
