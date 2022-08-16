@@ -211,7 +211,6 @@ class PlayState extends MusicBeatState
 	var campointX:Float = 0;
 	var campointY:Float = 0;
 	var bfturn:Bool = false;
-	var camMov:Int = 15;
 
 	var idiot:FlxBackdrop;
 	var idiot2:FlxBackdrop;
@@ -342,11 +341,8 @@ class PlayState extends MusicBeatState
 		camPos.x += gf.cameraPosition[0];
 		camPos.y += gf.cameraPosition[1];
 
-		if(!ClientPrefs.optOnlyNotes)
-		{
-			add(dadGroup);
-			add(boyfriendGroup);
-		}
+		add(dadGroup);
+		add(boyfriendGroup);
 
 		var lowercaseSong:String = SONG.song.toLowerCase();
 
@@ -1109,7 +1105,6 @@ class PlayState extends MusicBeatState
 	private var paused:Bool = false;
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
-	var limoSpeed:Float = 0;
 
 	override public function update(elapsed:Float)
 	{
@@ -1136,13 +1131,6 @@ class PlayState extends MusicBeatState
 
 		switch(curStage)
 		{
-			case "starved":
-				//fear is actually used as the health so
-				if(ratingString == 'N/A') {
-					scoreTxt.text = 'Sacrifices: ' + songMisses + ' | ' + ratingString;
-				} else {
-					scoreTxt.text = 'Sacrifices: ' + songMisses + ' | Rating: ' + ratingString + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%' + ') - ' + ratingFC  ;
-				}
 			default:
 				if(ClientPrefs.optHideHealthBar)
 				{
@@ -1668,8 +1656,8 @@ class PlayState extends MusicBeatState
 		if (SONG.notes[id] != null && camFollow.x != dad.getMidpoint().x + 150 && !SONG.notes[id].mustHitSection)
 		{
 			moveCamera(true);
-			campointX = camFollow.x;
-			campointY = camFollow.y;
+			campointX = camFollowPos.x;
+			campointY = camFollowPos.y;
 			bfturn = false;
 			callOnLuas('onMoveCamera', ['dad']);
 		}
@@ -1677,8 +1665,8 @@ class PlayState extends MusicBeatState
 		if (SONG.notes[id] != null && SONG.notes[id].mustHitSection && camFollow.x != boyfriend.getMidpoint().x - 100)
 		{
 			moveCamera(false);
-			campointX = camFollow.x;
-			campointY = camFollow.y;
+			campointX = camFollowPos.x;
+			campointY = camFollowPos.y;
 			bfturn = true;
 			callOnLuas('onMoveCamera', ['boyfriend']);
 
@@ -1937,6 +1925,10 @@ class PlayState extends MusicBeatState
 
 			coolText.text = Std.string(seperatedScore);
 
+			FlxTween.tween(rating, {alpha: 0}, 0.2, {
+				startDelay: Conductor.crochet * 0.001
+			});
+
 			FlxTween.tween(comboSpr, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
 				{
@@ -2173,38 +2165,6 @@ class PlayState extends MusicBeatState
 						}
 					}
 					return;
-				case "Hurt Note": //Hurt note
-					if(cpuControlled) return;
-
-					if(!boyfriend.stunned)
-					{
-						noteMiss(note);
-						if(!endingSong)
-						{
-							--songMisses;
-							RecalculateRating();
-							if(!note.isSustainNote) {
-								health -= 0.3;
-							}
-							else health -= 0.1;
-	
-							if(boyfriend.animation.getByName('hurt') != null) {
-								boyfriend.playAnim('hurt', true);
-								boyfriend.specialAnim = true;
-							}
-						}
-
-						note.wasGoodHit = true;
-						vocals.volume = 0;
-
-						if (!note.isSustainNote)
-						{
-							note.kill();
-							notes.remove(note, true);
-							note.destroy();
-						}
-					}
-					return;
 			}
 
 			if (!note.isSustainNote)
@@ -2246,14 +2206,18 @@ class PlayState extends MusicBeatState
 				{
 					if(gf != null)
 						{
-							cameraShit(animToPlay, false);
+							if(!note.isSustainNote){
+								cameraShit(animToPlay, false);
+							}
 							gf.playAnim(animToPlay + daAlt, true);
 							gf.holdTimer = 0;
 						}
 				}
 				else
 				{
-					cameraShit(animToPlay, false);
+					if(!note.isSustainNote){
+						cameraShit(animToPlay, false);
+					}
 					boyfriend.playAnim(animToPlay + daAlt, true);
 					boyfriend.holdTimer = 0;
 				}
@@ -2348,7 +2312,9 @@ class PlayState extends MusicBeatState
 
 			if(char != null)
 			{
-				cameraShit(animToPlay, true);
+				if(!note.isSustainNote){
+					cameraShit(animToPlay, true);
+				}
 				char.playAnim(animToPlay + altAnim, true);
 				char.holdTimer = 0;
 			}
@@ -2658,13 +2624,10 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	var curLight:Int = 0;
-	var curLightEvent:Int = 0;
-
+	var mult = /*0.7 1*/ 5;
 	function cameraShit(animToPlay, isDad)
 	{
-		//do some funny cam movement on next update lol
-		/*
+		//sorry i was too lazy to rename the settings var lol
 		if(isDad)
 		{
 			switch(animToPlay)
@@ -2672,42 +2635,26 @@ class PlayState extends MusicBeatState
 				case 'singLEFT':
 					if(!bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX - camMov, campointY);
-					}
-					if(!bfturn && curStage == "starved")
-					{
-						//camFollow.x = campointX - camMovFOF;
-						//smoothCamSetPos(campointX - camMovFOF, campointY);
+						camFollowPos.x = campointX - mult;
+						//snapCamFollowToPos(campointX - camMov, campointY);
 					}
 				case "singDOWN":
 					if(!bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX, campointY + camMov);
-					}
-					if(!bfturn && curStage == "starved")
-					{
-						//camFollow.y = campointY + camMovFOF;
-						//smoothCamSetPos(campointX, campointY + camMovFOF);
+						camFollowPos.y = campointY + mult;
+						//snapCamFollowToPos(campointX, campointY + camMov);
 					}
 				case "singUP":
 					if(!bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX, campointY - camMov);
-					}
-					if(!bfturn && curStage == "starved")
-					{
-						//camFollow.y = campointY - camMovFOF;
-						//smoothCamSetPos(campointX, campointY - camMovFOF);
+						camFollowPos.y = campointY - mult;
+						//snapCamFollowToPos(campointX, campointY - camMov);
 					}
 				case "singRIGHT":
 					if(!bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX + camMov, campointY);
-					}
-					if(!bfturn && curStage == "starved")
-					{
-						//camFollow.x = campointX + camMovFOF;
-						//smoothCamSetPos(campointX + camMovFOF, campointY);
+						camFollowPos.x = campointX + mult;
+						//snapCamFollowToPos(campointX + camMov, campointY);
 					}
 			}
 		}
@@ -2718,44 +2665,28 @@ class PlayState extends MusicBeatState
 				case 'singLEFT':
 					if(bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX - camMov, campointY);
-					}
-					if(bfturn && curStage == "starved")
-					{
-						//camFollow.x = campointX - camMovFOF;
-						//smoothCamSetPos(campointX - camMovFOF, campointY);
+						camFollowPos.x = campointX - mult;
+						//snapCamFollowToPos(campointX - camMov, campointY);
 					}
 				case "singDOWN":
 					if(bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX, campointY + camMov);	
-					}
-					if(bfturn && curStage == "starved")
-					{
-						//camFollow.y = campointY + camMovFOF;
-						//smoothCamSetPos(campointX, campointY + camMovFOF);
+						camFollowPos.y = campointY + mult;
+						//snapCamFollowToPos(campointX, campointY + camMov);	
 					}
 				case "singUP":
 					if(bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX, campointY - camMov);
-					}
-					if(bfturn && curStage == "starved")
-					{
-						//camFollow.y = campointY - camMovFOF;
-						//smoothCamSetPos(campointX, campointY - camMovFOF);
+						camFollowPos.y = campointY - mult;
+						//snapCamFollowToPos(campointX, campointY - camMov);
 					}
 				case "singRIGHT":
 					if(bfturn && ClientPrefs.snapCameraOnNote)
 					{
-						snapCamFollowToPos(campointX + camMov, campointY);
-					}
-					if(bfturn && curStage == "starved")
-					{
-						//camFollow.x = campointX + camMovFOF;
-						//smoothCamSetPos(campointX + camMovFOF, campointY);
+						camFollowPos.x = campointX + mult;
+						//snapCamFollowToPos(campointX + camMov, campointY);
 					}
 			}
-		}*/
+		}
 	}
 }

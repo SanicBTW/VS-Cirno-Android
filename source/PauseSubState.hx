@@ -18,7 +18,7 @@ class PauseSubState extends MusicBeatSubstate
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
 	var menuItems:Array<String> = [];
-	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Toggle Practice Mode', 'Botplay', 'Open charting mode', 'Exit to menu'];
+	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Toggle Practice Mode', 'Botplay', 'Exit to menu'];
 	var difficultyChoices = [];
 	var curSelected:Int = 0;
 
@@ -183,9 +183,6 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.usedPractice = false;
 					PlayState.changedDifficulty = false;
 					PlayState.cpuControlled = false;
-
-				case 'Open charting mode':
-					LoadingState.loadAndSwitchState(new ChartingState());
 
 				case 'BACK':
 					menuItems = menuItemsOG;

@@ -710,9 +710,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 		'Hide Song Length',
 		'Flashing Lights',
 		'Camera Zooms',
-		'Snap Camera on Note P',
+		'Camera movement',
 		'OPTIMIZATION',
-		'Only Notes',
 		'Disable score tween',
 		'Hide Health Bar'
 	];
@@ -723,15 +722,11 @@ class PreferencesSubstate extends MusicBeatSubstate
 	private var grpTexts:FlxTypedGroup<AttachedText>;
 	private var textNumber:Array<Int> = [];
 
-	private var characterLayer:FlxTypedGroup<Character>;
-	private var showCharacter:Character = null;
 	private var descText:FlxText;
 
 	public function new()
 	{
 		super();
-		characterLayer = new FlxTypedGroup<Character>();
-		add(characterLayer);
 
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
@@ -825,9 +820,6 @@ class PreferencesSubstate extends MusicBeatSubstate
 					spr.alpha = 0;
 				}
 			}
-			if(showCharacter != null) {
-				showCharacter.alpha = 0;
-			}
 			descText.alpha = 0;
 			close();
 			FlxG.sound.play(Paths.sound('cancelMenu'));
@@ -854,7 +846,6 @@ class PreferencesSubstate extends MusicBeatSubstate
 
 					case 'Anti-Aliasing':
 						ClientPrefs.globalAntialiasing = !ClientPrefs.globalAntialiasing;
-						showCharacter.antialiasing = ClientPrefs.globalAntialiasing;
 						for (item in grpOptions) {
 							item.antialiasing = ClientPrefs.globalAntialiasing;
 						}
@@ -911,7 +902,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 						ClientPrefs.optDisableScoreTween = !ClientPrefs.optDisableScoreTween;
 					case 'Hide Health Bar':
 						ClientPrefs.optHideHealthBar = !ClientPrefs.optHideHealthBar;
-					case 'Snap Camera on Note P':
+					case 'Camera movement':
 						ClientPrefs.snapCameraOnNote = !ClientPrefs.snapCameraOnNote;
 				}
 				FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -950,10 +941,6 @@ class PreferencesSubstate extends MusicBeatSubstate
 			} else {
 				holdTime = 0;
 			}
-		}
-
-		if(showCharacter != null && showCharacter.animation.curAnim.finished) {
-			showCharacter.dance();
 		}
 
 		if(nextAccept > 0) {
@@ -1015,8 +1002,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 				daText = 'Disables score bop on sick';
 			case 'Hide Health Bar':
 				daText = 'Hides health bar and replaces it with a percentage';
-			case 'Snap Camera on Note P':
-				daText = 'Snaps the camera on the note direction';
+			case 'Camera movement':
+				daText = 'Moves the camera on the note direction';
 		}
 		descText.text = daText;
 
@@ -1049,19 +1036,6 @@ class PreferencesSubstate extends MusicBeatSubstate
 					text.alpha = 1;
 				}
 			}
-		}
-
-		if(options[curSelected] == 'Anti-Aliasing') {
-			if(showCharacter == null) {
-				showCharacter = new Character(840, 170, 'bf', true);
-				showCharacter.setGraphicSize(Std.int(showCharacter.width * 0.8));
-				showCharacter.updateHitbox();
-				showCharacter.dance();
-				characterLayer.add(showCharacter);
-			}
-		} else if(showCharacter != null) {
-			characterLayer.clear();
-			showCharacter = null;
 		}
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 	}
@@ -1108,7 +1082,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 						daValue = ClientPrefs.optDisableScoreTween;
 					case 'Hide Health Bar':
 						daValue = ClientPrefs.optHideHealthBar;
-					case 'Snap Camera on Note P':
+					case 'Camera movement':
 						daValue = ClientPrefs.snapCameraOnNote;
 				}
 				checkbox.daValue = daValue;
