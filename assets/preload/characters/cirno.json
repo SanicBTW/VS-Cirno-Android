@@ -56,69 +56,14 @@
 			"name": "CIRNO_IDLE"
 		},
 		{
-			"loop": true,
-			"offsets": [
-				0,
-				0
-			],
-			"anim": "idle-loop",
-			"fps": 24,
-			"name": "CIRNO_IDLE",
-			"indices": []
-		},
-		{
-			"loop": true,
-			"offsets": [
-				51,
-				20
-			],
-			"anim": "singLEFT-loop",
-			"fps": 24,
-			"name": "CIRNO_LEFT",
-			"indices": []
-		},
-		{
-			"loop": true,
-			"offsets": [
-				10,
-				1
-			],
-			"anim": "singRIGHT-loop",
-			"fps": 24,
-			"name": "CIRNO_RIGHT",
-			"indices": []
-		},
-		{
-			"loop": true,
-			"offsets": [
-				24,
-				99
-			],
-			"anim": "singUP-loop",
-			"fps": 24,
-			"name": "CIRNO_UP",
-			"indices": []
-		},
-		{
-			"offsets": [
-				0,
-				-30
-			],
-			"loop": false,
-			"fps": 24,
-			"anim": "singDOWN-loop",
-			"indices": [],
-			"name": "CIRNO_DOWN"
-		},
-		{
 			"offsets": [
 				50,
 				20
 			],
-			"indices": [],
+			"loop": false,
 			"fps": 24,
 			"anim": "singLEFT-alt",
-			"loop": false,
+			"indices": [],
 			"name": "CIRNO_censorLEFT"
 		},
 		{
@@ -126,10 +71,10 @@
 				10,
 				1
 			],
-			"indices": [],
+			"loop": false,
 			"fps": 24,
 			"anim": "singRIGHT-alt",
-			"loop": false,
+			"indices": [],
 			"name": "CIRNO_censorRIGHT"
 		},
 		{
@@ -137,10 +82,10 @@
 				0,
 				-30
 			],
-			"indices": [],
+			"loop": false,
 			"fps": 24,
 			"anim": "singDOWN-alt",
-			"loop": false,
+			"indices": [],
 			"name": "CIRNO_censorDOWN"
 		},
 		{
@@ -148,17 +93,17 @@
 				24,
 				99
 			],
-			"indices": [],
+			"loop": false,
 			"fps": 24,
 			"anim": "singUP-alt",
-			"loop": false,
+			"indices": [],
 			"name": "CIRNO_censorUP"
 		}
 	],
 	"no_antialiasing": false,
 	"image": "characters/cirno",
 	"position": [
-		-120,
+		-150,
 		0
 	],
 	"healthicon": "cirno",
@@ -169,8 +114,8 @@
 		215
 	],
 	"camera_position": [
-		-50,
-		170
+		40,
+		160
 	],
 	"sing_duration": 6.1,
 	"scale": 0.7

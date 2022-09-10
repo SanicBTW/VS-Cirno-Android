@@ -40,13 +40,29 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
+	public var texture(default, set):String = null;
+
 	public var noAnimation:Bool = false;
 
+	public var hitsoundDisabled:Bool = false;
+
+	private function set_texture(value:String):String {
+		if(texture != value) {
+			reloadNote('', value);
+		}
+		texture = value;
+		return value;
+	}
+
 	private function set_noteType(value:String):String {
+		colorSwap.hue = ClientPrefs.arrowHSV[noteData % 4][0] / 360;
+		colorSwap.saturation = ClientPrefs.arrowHSV[noteData % 4][1] / 100;
+		colorSwap.brightness = ClientPrefs.arrowHSV[noteData % 4][2] / 100;
+
 		if(noteData > -1 && noteType != value) {
 			switch(value) {
 				case "Cirno Note":
-					reloadNote('CIRNO');
+					texture = "CIRNONOTE_assets";
 					colorSwap.hue = 0;
 					colorSwap.saturation = 0;
 					colorSwap.brightness = 0;
@@ -54,10 +70,6 @@ class Note extends FlxSprite
 					noAnimation = true;
 				case 'GF Sing':
 					gfNote = true;
-				default:
-					colorSwap.hue = ClientPrefs.arrowHSV[noteData % 4][0] / 360;
-					colorSwap.saturation = ClientPrefs.arrowHSV[noteData % 4][1] / 100;
-					colorSwap.brightness = ClientPrefs.arrowHSV[noteData % 4][2] / 100;
 			}
 			noteType = value;
 		}
@@ -89,6 +101,7 @@ class Note extends FlxSprite
 		antialiasing = ClientPrefs.globalAntialiasing;
 
 		if(noteData > -1) {
+			texture = '';
 			colorSwap = new ColorSwap();
 			shader = colorSwap.shader;
 
@@ -114,6 +127,7 @@ class Note extends FlxSprite
 		if (isSustainNote && prevNote != null)
 		{
 			alpha = 0.6;
+			hitsoundDisabled = true;
 			if(ClientPrefs.downScroll) flipY = true;
 
 			x += width / 2;
@@ -156,20 +170,40 @@ class Note extends FlxSprite
 		if(!isPixel && noteData > -1) reloadNote();
 	}
 
-	function reloadNote(?prefix:String = '', ?suffix:String = '') 
+	function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = '') 
 	{
-		var skin:String = "NOTE_assets";
+		if(prefix == null) prefix = '';
+		if(texture == null) texture = '';
+		if(suffix == null) suffix = '';
+		
+		var skin:String = texture;
+		if(texture.length < 1) {
+			skin = PlayState.SONG.arrowSkin;
+			if(skin == null || skin.length < 1) {
+				skin = 'NOTE_assets';
+			}
+		}
 
 		var animName:String = null;
 		if(animation.curAnim != null) {
 			animName = animation.curAnim.name;
 		}
 
-		var blahblah:String = prefix + skin + suffix;
+		var arraySkin:Array<String> = skin.split('/');
+		arraySkin[arraySkin.length-1] = prefix + arraySkin[arraySkin.length-1] + suffix;
+
+		var lastScaleY:Float = scale.y;
+		var blahblah:String = arraySkin.join('/');
 		frames = Paths.getSparrowAtlas(blahblah);
 		loadNoteAnims();
+		antialiasing = ClientPrefs.globalAntialiasing;
+		if(isSustainNote) {
+			scale.y = lastScaleY;
+		}
+		updateHitbox();
 
-		animation.play(animName, true);
+		if(animName != null)
+			animation.play(animName, true);
 
 		if(inEditor) {
 			setGraphicSize(ChartingState.GRID_SIZE, ChartingState.GRID_SIZE);

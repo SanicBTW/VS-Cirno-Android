@@ -14,7 +14,7 @@
 		{
 			"loop": false,
 			"offsets": [
-				12,
+				5,
 				-6
 			],
 			"anim": "singLEFT",
@@ -25,8 +25,8 @@
 		{
 			"loop": false,
 			"offsets": [
-				-10,
-				-50
+				-20,
+				-51
 			],
 			"anim": "singDOWN",
 			"fps": 24,
@@ -36,7 +36,7 @@
 		{
 			"loop": false,
 			"offsets": [
-				-29,
+				-46,
 				27
 			],
 			"anim": "singUP",
@@ -47,7 +47,7 @@
 		{
 			"loop": false,
 			"offsets": [
-				-38,
+				-48,
 				-7
 			],
 			"anim": "singRIGHT",
@@ -58,8 +58,8 @@
 		{
 			"loop": false,
 			"offsets": [
-				12,
-				24
+				7,
+				19
 			],
 			"anim": "singLEFTmiss",
 			"fps": 24,
@@ -69,7 +69,7 @@
 		{
 			"loop": false,
 			"offsets": [
-				-11,
+				-15,
 				-19
 			],
 			"anim": "singDOWNmiss",
@@ -80,7 +80,7 @@
 		{
 			"loop": false,
 			"offsets": [
-				-29,
+				-46,
 				27
 			],
 			"anim": "singUPmiss",
@@ -91,8 +91,8 @@
 		{
 			"loop": false,
 			"offsets": [
-				-30,
-				21
+				-44,
+				22
 			],
 			"anim": "singRIGHTmiss",
 			"fps": 24,
@@ -113,7 +113,7 @@
 		{
 			"loop": false,
 			"offsets": [
-				15,
+				14,
 				18
 			],
 			"anim": "hurt",
@@ -135,42 +135,42 @@
 		{
 			"loop": false,
 			"offsets": [
-				404,
-				444
+				-10,
+				-16
 			],
-			"anim": "firstDeath",
+			"anim": "dodge",
 			"fps": 24,
-			"name": "BF dies",
-			"indices": []
-		},
-		{
-			"loop": true,
-			"offsets": [
-				176,
-				444
-			],
-			"anim": "deathLoop",
-			"fps": 24,
-			"name": "BF Dead Loop",
+			"name": "boyfriend dodge",
 			"indices": []
 		},
 		{
 			"loop": false,
 			"offsets": [
-				176,
-				444
+				294,
+				267
 			],
-			"anim": "deathConfirm",
+			"anim": "attack",
 			"fps": 24,
-			"name": "BF Dead confirm",
+			"name": "boyfriend attack",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-40,
+				-40
+			],
+			"anim": "pre-attack",
+			"fps": 24,
+			"name": "bf pre attack",
 			"indices": []
 		}
 	],
 	"no_antialiasing": false,
-	"image": "characters/BOYFRIENDCIRNO",
+	"image": "characters/BOYFRIEND",
 	"position": [
 		0,
-		260
+		350
 	],
 	"healthicon": "bf",
 	"flip_x": true,
@@ -180,8 +180,8 @@
 		209
 	],
 	"camera_position": [
-		190,
-		-210
+		380,
+		-190
 	],
 	"sing_duration": 4,
 	"scale": 1

@@ -36,7 +36,8 @@ class TitleState extends MusicBeatState
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
-	static var initialized:Bool = false;
+	public static var initialized:Bool = false;
+	public static var closedState:Bool = false;
 
 	var blackScreen:FlxSprite;
 	var credGroup:FlxGroup;
@@ -123,11 +124,8 @@ class TitleState extends MusicBeatState
 
 		FlxTween.tween(iceFog, {x: 0}, 15, {type: FlxTweenType.PINGPONG, ease: FlxEase.quadInOut});
 
-		logoBl = new FlxSprite(425, 25);
-		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+		logoBl = new FlxSprite(425, 25).loadGraphic(Paths.image("titlescreenLogo"));
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
-		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
 
 		swagShader = new ColorSwap();
@@ -199,6 +197,7 @@ class TitleState extends MusicBeatState
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 
+		#if android
 		for (touch in FlxG.touches.list)
 		{
 			if (touch.justPressed)
@@ -206,6 +205,7 @@ class TitleState extends MusicBeatState
 				pressedEnter = true;
 			}
 		}
+		#end
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 
@@ -283,13 +283,9 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	private static var closedState:Bool = false;
 	override function beatHit()
 	{
 		super.beatHit();
-
-		if(logoBl != null) 
-			logoBl.animation.play('bump');
 
 		if(!closedState) {
 			switch (curBeat)
