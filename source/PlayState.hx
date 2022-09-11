@@ -256,33 +256,59 @@ class PlayState extends MusicBeatState
 
 				defaultCamZoom = 1;
 
+				BF_X = 770;
+				BF_Y = 20;
+
+				DAD_X = 100;
+				DAD_Y = 125;
+
+				GameOverSubstate.characterName = "bf-dead";
+				GameOverSubstate.deathSoundName = "fnf_loss_sfx_explode";
+
 				var bg:FlxSprite = new FlxSprite(-200, -200).loadGraphic(Paths.image("cirno/chiru/cirnobg"));
 				bg.scrollFactor.set();
+				bg.antialiasing = ClientPrefs.globalAntialiasing;
 				add(bg);
 
 				idiot = new FlxBackdrop(Paths.image('cirno/chiru/idiot'), 1, 0, true, false);
+				idiot.antialiasing = ClientPrefs.globalAntialiasing;
 				add(idiot);
 				idiot.velocity.set(100, 0);
 				idiot.scrollFactor.set(0, 0);
 
 				idiot2 = new FlxBackdrop(Paths.image('cirno/chiru/idiot2'), -1, 0, true, false);
+				idiot2.antialiasing = ClientPrefs.globalAntialiasing;
 				add(idiot2);
 				idiot2.velocity.set(-100, 0);
 				idiot2.scrollFactor.set(0, 0);
 
 				chiritexttop = new FlxSprite(-1080, 0).loadGraphic(Paths.image('cirno/chiru/chirutext'));
+				chiritexttop.antialiasing = ClientPrefs.globalAntialiasing;
 				chiritexttop.scrollFactor.set();
 				add(chiritexttop);
 
 				chiritextbottom = new FlxSprite(1080, 0).loadGraphic(Paths.image('cirno/chiru/chirutext2'));
+				chiritextbottom.antialiasing = ClientPrefs.globalAntialiasing;
 				chiritextbottom.scrollFactor.set();
 				add(chiritextbottom);
 
 				var stageFront:FlxSprite = new FlxSprite(-425, -330).loadGraphic(Paths.image('cirno/chiru/cirnofloor'));
+				stageFront.antialiasing = ClientPrefs.globalAntialiasing;
 				stageFront.scrollFactor.set(0.9, 0.9);
 				stageFront.setGraphicSize(Std.int(stageFront.width * 1.15));
 				stageFront.updateHitbox();
 				add(stageFront);
+			
+			case 'perfect-math':
+				curStage = "pmath";
+
+				defaultCamZoom = 0.9;
+
+				BF_X = 800;
+				BF_Y = -250;
+
+				DAD_X = 600;
+				DAD_Y = 165;
 		}
 
 		var gfVersion:String = SONG.player3;
@@ -319,7 +345,6 @@ class PlayState extends MusicBeatState
 		camPos.x += gf.cameraPosition[0];
 		camPos.y += gf.cameraPosition[1];
 
-		add(gfGroup);
 		add(dadGroup);
 		add(boyfriendGroup);
 
@@ -500,6 +525,8 @@ class PlayState extends MusicBeatState
 		CustomFadeTransition.nextCamera = camOther;
 
 		beatHit(); //another port with the same problem and same easy fix, i hate myself
+
+		onCreatePost();
 	}
 	
 	public function reloadHealthBarColors() {
@@ -509,6 +536,7 @@ class PlayState extends MusicBeatState
 	}
 
 	public function addCharacterToList(newCharacter:String, type:Int) {
+		FlxG.log.add("adding char to list " + newCharacter + "-" + type);
 		switch(type) {
 			case 0:
 				if(!boyfriendMap.exists(newCharacter)) {
@@ -664,9 +692,7 @@ class PlayState extends MusicBeatState
 
 	function startSong():Void
 	{
-		#if sys
-		System.gc();
-		#end
+		openfl.system.System.gc();
 
 		startingSong = false;
 
@@ -698,9 +724,7 @@ class PlayState extends MusicBeatState
 
 	private function generateSong(dataPath:String):Void
 	{
-		#if sys
-		System.gc();
-		#end
+		openfl.system.System.gc();
 
 		var songData = SONG;
 		Conductor.changeBPM(songData.bpm);
@@ -2370,6 +2394,7 @@ class PlayState extends MusicBeatState
 			dad.dance();
 		}
 
+		//migrate to stephit??
 		switch(curStage)
 		{
 			case 'chiru':
@@ -2494,6 +2519,16 @@ class PlayState extends MusicBeatState
 						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
 						cirnoMode = false;
 				}
+			case 'pmath':
+				switch(curBeat)
+				{
+					case 30:
+						for(i in 0...opponentStrums.length){ opponentStrums.members[i].alpha = 1; }
+						for(i in 0...playerStrums.length){ playerStrums.members[i].alpha = 1; }
+
+						changeChar(0, "bf-bus");
+						changeChar(1, "cirno-bus");
+				}
 		}
 
 		lastBeatHit = curBeat;
@@ -2579,7 +2614,6 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-
 	function getScoreTextFormat():String
 	{
 		if(ClientPrefs.optHideHealthBar)
@@ -2623,5 +2657,65 @@ class PlayState extends MusicBeatState
 			}
 		}
 		return "";
+	}
+
+	function changeChar(charType:Int, value2:String)
+	{
+		switch(charType)
+		{
+			case 0:
+				if(boyfriend.curCharacter != value2) {
+					if(!boyfriendMap.exists(value2)) {
+						addCharacterToList(value2, charType);
+					}
+
+					boyfriend.visible = false;
+					boyfriend = boyfriendMap.get(value2);
+					boyfriend.visible = true;
+					iconP1.changeIcon(boyfriend.healthIcon);
+
+					openfl.system.System.gc();
+				}
+
+			case 1:
+				if(dad.curCharacter != value2) {
+					if(!dadMap.exists(value2)) {
+						addCharacterToList(value2, charType);
+					}
+
+					var wasGf:Bool = dad.curCharacter.startsWith('gf');
+					dad.visible = false;
+					dad = dadMap.get(value2);
+					if(!dad.curCharacter.startsWith('gf')) {
+						if(wasGf) {
+							gf.visible = true;
+						}
+					} else {
+						gf.visible = false;
+					}
+					dad.visible = true;
+					iconP2.changeIcon(dad.healthIcon);
+
+					openfl.system.System.gc();
+				}
+		}
+		reloadHealthBarColors();
+	}
+
+	function onCreatePost()
+	{
+		openfl.system.System.gc();
+
+		if(curStage == "pmath")
+		{
+			for(i in 0...opponentStrums.length){ opponentStrums.members[i].alpha = 0; }
+			for(i in 0...playerStrums.length){ playerStrums.members[i].alpha = 0; }
+
+			//preloading these for literally nothing ffs or maybe not idk help
+			addCharacterToList('cirno-bus', 1);
+			addCharacterToList('bf-bus', 0);
+			addCharacterToList("bf-pm3", 0);
+			addCharacterToList("cirno-pm3", 1);
+		}
 	}
 }

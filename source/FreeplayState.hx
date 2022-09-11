@@ -150,19 +150,13 @@ class FreeplayState extends MusicBeatState
 		textBG.alpha = 0.6;
 		add(textBG);
 
-		#if PRELOAD_ALL
-		var leText:String = " ";
+		var leText:String = "Happy Cirno Day! Mod made by Egg Overlord, Sector03, FriedFrick and .ult | Port by SanicBTW";
 		var size:Int = 16;
-		#else
-		var leText:String = " ";
-		var size:Int = 18;
-		#end
 		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, size);
 		text.setFormat(Paths.font("vcr.ttf"), size, FlxColor.WHITE, RIGHT);
 		text.scrollFactor.set();
 		add(text);
 
-		//bro add functions on other buttons or smth
 		#if android
 		addVirtualPad(LEFT_FULL, A_B);
 		#end
@@ -281,6 +275,7 @@ class FreeplayState extends MusicBeatState
 			}
 			if(FlxG.keys.pressed.SHIFT)
 			{
+				//HELLO??? CHARTING IS FUCKING BROKEN, HELLO????
 				LoadingState.loadAndSwitchState(new ChartingState());
 			}
 			else
