@@ -1,5 +1,6 @@
 package;
 
+import flixel.addons.display.FlxBackdrop;
 import flixel.ui.FlxButton;
 #if desktop
 import Discord.DiscordClient;
@@ -190,6 +191,14 @@ class PlayState extends MusicBeatState
 
 	var singAnims = ["singLEFT", "singDOWN", "singUP", "singRIGHT"];
 
+	var idiot:FlxBackdrop;
+	var idiot2:FlxBackdrop;
+
+	var cirnoMode:Bool = false;
+
+	var chiritexttop:FlxSprite;
+	var chiritextbottom:FlxSprite;
+
 	override public function create()
 	{
 		PauseSubState.songName = null; //Reset to default
@@ -239,6 +248,42 @@ class PlayState extends MusicBeatState
 		#end
 
 		GameOverSubstate.resetVariables();
+
+		switch (SONG.song.toLowerCase())
+		{	
+			case 'chirumiru':
+				curStage = 'chiru';
+
+				defaultCamZoom = 1;
+
+				var bg:FlxSprite = new FlxSprite(-200, -200).loadGraphic(Paths.image("cirno/chiru/cirnobg"));
+				bg.scrollFactor.set();
+				add(bg);
+
+				idiot = new FlxBackdrop(Paths.image('cirno/chiru/idiot'), 1, 0, true, false);
+				add(idiot);
+				idiot.velocity.set(100, 0);
+				idiot.scrollFactor.set(0, 0);
+
+				idiot2 = new FlxBackdrop(Paths.image('cirno/chiru/idiot2'), -1, 0, true, false);
+				add(idiot2);
+				idiot2.velocity.set(-100, 0);
+				idiot2.scrollFactor.set(0, 0);
+
+				chiritexttop = new FlxSprite(-1080, 0).loadGraphic(Paths.image('cirno/chiru/chirutext'));
+				chiritexttop.scrollFactor.set();
+				add(chiritexttop);
+
+				chiritextbottom = new FlxSprite(1080, 0).loadGraphic(Paths.image('cirno/chiru/chirutext2'));
+				chiritextbottom.scrollFactor.set();
+				add(chiritextbottom);
+
+				var stageFront:FlxSprite = new FlxSprite(-425, -330).loadGraphic(Paths.image('cirno/chiru/cirnofloor'));
+				stageFront.scrollFactor.set(0.9, 0.9);
+				stageFront.setGraphicSize(Std.int(stageFront.width * 1.15));
+				stageFront.updateHitbox();
+				add(stageFront);
+		}
 
 		var gfVersion:String = SONG.player3;
 		if(gfVersion == null || gfVersion.length < 1) {
@@ -453,6 +498,8 @@ class PlayState extends MusicBeatState
 		openfl.system.System.gc();
 
 		CustomFadeTransition.nextCamera = camOther;
+
+		beatHit(); //another port with the same problem and same easy fix, i hate myself
 	}
 	
 	public function reloadHealthBarColors() {
@@ -679,6 +726,7 @@ class PlayState extends MusicBeatState
 		var daBeats:Int = 0; // Not exactly representative of 'daBeats' lol, just how much it has looped
 
 		var songName:String = SONG.song.toLowerCase();
+		/*
 		var file:String = Paths.json(songName + '/events');
 		if (OpenFlAssets.exists(file)) {
 			var eventsData:Array<SwagSection> = Song.loadFromJson('events', songName).notes;
@@ -692,7 +740,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-		}
+		}*/
 
 		for (section in noteData)
 		{
@@ -1976,6 +2024,8 @@ class PlayState extends MusicBeatState
 
 			switch(daNote.noteType)
 			{
+				case 'Cirno Note':
+					//nothing
 				default:
 					combo = 0;
 					health -= 0.04;
@@ -2042,9 +2092,6 @@ class PlayState extends MusicBeatState
 				FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume);
 			}
 
-			switch(note.noteType) {
-			}
-
 			if (!note.isSustainNote)
 			{
 				combo += 1;
@@ -2064,9 +2111,41 @@ class PlayState extends MusicBeatState
 
 				if(char != null)
 				{
-					cameraShit(singAnims[Std.int(Math.abs(note.noteData)) % 4], false);
-					char.playAnim(singAnims[Std.int(Math.abs(note.noteData)) % 4] + daAlt, true);
-					char.holdTimer = 0;
+					switch(note.noteType) 
+					{
+						//rewrite code
+						case 'Cirno Note':
+							if(cpuControlled) return;
+
+							if(!boyfriend.stunned)
+							{
+								noteMiss(note);
+								if(!endingSong)
+								{
+									--songMisses;
+									RecalculateRating();
+									if(!note.isSustainNote) {
+										health -= 100;
+									}
+									else health -= 100;
+								}
+		
+								note.wasGoodHit = true;
+								vocals.volume = 0;
+		
+								if (!note.isSustainNote)
+								{
+									note.kill();
+									notes.remove(note, true);
+									note.destroy();
+								}
+							}
+							return;
+						default:
+							cameraShit(singAnims[Std.int(Math.abs(note.noteData)) % 4], false);
+							char.playAnim(singAnims[Std.int(Math.abs(note.noteData)) % 4] + daAlt, true);
+							char.holdTimer = 0;
+					}
 				}
 
 				if(note.noteType == "Hey!") 
@@ -2237,7 +2316,6 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		//?
 		if (generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)] != null && !endingSong && !isCameraOnForcedPos)
 		{
 			moveCameraSection(Std.int(curStep / 16));
@@ -2291,6 +2369,133 @@ class PlayState extends MusicBeatState
 		{
 			dad.dance();
 		}
+
+		switch(curStage)
+		{
+			case 'chiru':
+				switch(curBeat)
+				{
+					case 48:
+						defaultCamZoom = 1.05;
+					case 50:
+						defaultCamZoom = 1.07;
+					case 52:
+						defaultCamZoom = 1.09;
+					case 54:
+						defaultCamZoom = 1.11;
+					case 56:
+						defaultCamZoom = 1.13;
+					case 58:
+						defaultCamZoom = 1.16;
+					case 60:
+						defaultCamZoom = 1.18;
+					case 64:
+						defaultCamZoom = 1.20;
+					case 66:
+						defaultCamZoom = 1.35;
+					case 68:
+						defaultCamZoom = 1.15;
+					case 70:
+						defaultCamZoom = 1.25;
+					case 72:
+						defaultCamZoom = 1.07;
+					case 74:
+						defaultCamZoom = 1.15;
+					case 76:
+						defaultCamZoom = 1.3;
+					case 77:
+						defaultCamZoom = 1.2;
+					case 78:
+						defaultCamZoom = 1.1;
+					case 79:
+						defaultCamZoom = 1.0;
+					case 80:
+						defaultCamZoom = 1.0;
+						cirnoMode = true;
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 84:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 88:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 96:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 104:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 112:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 116:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 120:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 128:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 132:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 136:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 148:
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+						cirnoMode = false;
+					case 280:
+						cirnoMode = true;
+					case 293:
+						defaultCamZoom = 1.7;
+					case 296:
+						defaultCamZoom = 1.0;
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 300:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 304:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 312:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 316:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 320:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 328:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 332:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 336:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 344:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 348:
+						FlxTween.tween(chiritexttop, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+					case 352:
+						FlxTween.tween(chiritextbottom, {x: 0}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+					case 360:
+						FlxTween.tween(chiritexttop, {x: -1080}, 1, {ease: FlxEase.circOut});
+						FlxTween.tween(chiritextbottom, {x: 1080}, 1, {ease: FlxEase.circOut});
+						cirnoMode = false;
+				}
+		}
+
 		lastBeatHit = curBeat;
 	}
 

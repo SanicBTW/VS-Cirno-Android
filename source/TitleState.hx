@@ -124,7 +124,7 @@ class TitleState extends MusicBeatState
 
 		FlxTween.tween(iceFog, {x: 0}, 15, {type: FlxTweenType.PINGPONG, ease: FlxEase.quadInOut});
 
-		logoBl = new FlxSprite(425, 25).loadGraphic(Paths.image("titlescreenLogo"));
+		logoBl = new FlxSprite(710, 25).loadGraphic(Paths.image("titlescreenLogo"));
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
 		logoBl.updateHitbox();
 
